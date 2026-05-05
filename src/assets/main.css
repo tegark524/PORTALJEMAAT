@@ -1,0 +1,6 @@
+@import 'tailwindcss';
+
+/* Kamu bisa tambah font atau warna custom dari desain.md di sini nanti */
+:root {
+  --gkjw-maroon: #800000;
+}
