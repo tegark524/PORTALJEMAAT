@@ -15,8 +15,20 @@
       </div>
 
       <!-- Google Login Button -->
-      <div class="flex justify-center mb-6">
-        <GoogleLogin :callback="handleGoogleCallback" prompt />
+      <div class="flex justify-center items-center min-h-[44px] mb-6">
+        <div v-if="isLoading" class="flex flex-row gap-2 justify-center items-center">
+          <div class="w-2.5 h-2.5 rounded-full bg-[#800000] animate-bounce"></div>
+          <div
+            class="w-2.5 h-2.5 rounded-full bg-[#800000] animate-bounce [animation-delay:-.3s]"
+          ></div>
+          <div
+            class="w-2.5 h-2.5 rounded-full bg-[#800000] animate-bounce [animation-delay:-.5s]"
+          ></div>
+          <span class="ml-2 text-[#4e4e4e] font-medium text-[14px]">Memverifikasi akses...</span>
+        </div>
+        <div v-show="!isLoading">
+          <GoogleLogin :callback="handleGoogleCallback" prompt />
+        </div>
       </div>
 
       <!-- Error Message -->
@@ -35,9 +47,11 @@ import { useChurchStore } from '@/stores/churchStore'
 const router = useRouter()
 const store = useChurchStore()
 const errorMsg = ref('')
+const isLoading = ref(false)
 
 const handleGoogleCallback = async (response) => {
   errorMsg.value = '' // Clear previous errors
+  isLoading.value = true
   try {
     const id_token = response.credential
     if (!id_token) {
@@ -49,6 +63,8 @@ const handleGoogleCallback = async (response) => {
     router.push('/admin')
   } catch (err) {
     errorMsg.value = err.message
+  } finally {
+    isLoading.value = false
   }
 }
 </script>

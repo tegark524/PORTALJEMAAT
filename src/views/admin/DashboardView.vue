@@ -256,6 +256,95 @@
               </div>
             </div>
           </div>
+
+          <!-- Monitoring Renungan Chart (7 Hari) -->
+          <div
+            class="bg-[#ffffff] rounded-[16px] p-6 md:p-8 border border-[#e7e5e4] shadow-[0_4px_16px_rgba(0,0,0,0.04)] mt-6"
+          >
+            <div
+              class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4"
+            >
+              <div>
+                <h3 class="font-serif text-[22px] md:text-[24px] font-bold text-[#0c0a09]">
+                  Monitoring Renungan
+                </h3>
+                <p class="text-[#777169] text-[13px] md:text-[14px] mt-1">
+                  Pantau ketersediaan renungan 3 hari ke belakang hingga 3 hari ke depan.
+                </p>
+              </div>
+              <div
+                class="flex items-center gap-4 text-[12px] md:text-[13px] font-medium text-[#4e4e4e] bg-[#f5f5f5] px-4 py-2 rounded-full border border-[#e7e5e4]"
+              >
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-[#16a34a] shadow-sm"></span> Tersedia
+                </div>
+                <div class="flex items-center gap-2">
+                  <span
+                    class="w-3 h-3 rounded-full bg-[#fee2e2] shadow-sm border border-[#fca5a5]"
+                  ></span>
+                  Kosong
+                </div>
+              </div>
+            </div>
+
+            <div class="relative mt-8 pt-4">
+              <!-- Highlight Hari Ini Background -->
+              <div
+                class="absolute left-[50%] -translate-x-1/2 top-0 h-full w-[14%] bg-[#faf7f2] rounded-xl -z-10 border border-[#e7e5e4]/50"
+              ></div>
+
+              <!-- Bars -->
+              <div
+                class="flex items-end justify-between h-40 gap-2 md:gap-4 relative z-10 px-2 md:px-4 border-b border-[#e7e5e4] pb-4"
+              >
+                <div
+                  v-for="day in weeklyRenunganChart"
+                  :key="day.id"
+                  class="flex flex-col items-center flex-1 h-full justify-end group cursor-pointer"
+                >
+                  <span
+                    class="text-[10px] md:text-[12px] font-bold mb-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
+                    :class="day.hasRenungan ? 'text-[#16a34a]' : 'text-[#dc2626]'"
+                  >
+                    {{ day.hasRenungan ? 'Tersedia' : 'Kosong' }}
+                  </span>
+                  <div
+                    class="w-full max-w-[32px] md:max-w-[48px] rounded-t-xl transition-all duration-1000 ease-out flex-shrink-0"
+                    :class="
+                      day.hasRenungan
+                        ? 'h-[120px] bg-[#16a34a] shadow-[0_4px_12px_rgba(22,163,74,0.25)]'
+                        : 'h-[24px] bg-[#fee2e2] border border-[#fca5a5]'
+                    "
+                  ></div>
+                </div>
+              </div>
+
+              <!-- Labels -->
+              <div
+                class="flex items-center justify-between gap-2 md:gap-4 mt-4 px-2 md:px-4 relative z-10"
+              >
+                <div
+                  v-for="day in weeklyRenunganChart"
+                  :key="'label-' + day.id"
+                  class="flex flex-col items-center flex-1"
+                >
+                  <span
+                    class="text-[11px] md:text-[14px] whitespace-nowrap text-center transition-colors"
+                    :class="
+                      day.isToday
+                        ? 'font-bold text-[#800000] bg-[#800000]/10 px-2.5 py-1 rounded-md'
+                        : 'font-medium text-[#4e4e4e]'
+                    "
+                  >
+                    {{ day.label }}
+                  </span>
+                  <span class="text-[9px] md:text-[11px] text-[#a8a29e] mt-1">{{
+                    day.dateLabel
+                  }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <router-view></router-view>
@@ -308,6 +397,44 @@ const renunganStatus = computed(() => {
   } else {
     return { status: 'success', text: 'Renungan hari ini & besok tersedia' }
   }
+})
+
+const weeklyRenunganChart = computed(() => {
+  const chartData = []
+  const today = new Date()
+
+  // Mengisi data 3 hari ke belakang, Hari Ini, dan 3 hari ke depan (Total 7 hari)
+  for (let i = -3; i <= 3; i++) {
+    const d = new Date(today)
+    d.setDate(today.getDate() + i)
+
+    const isSameDate = (date1, date2) => {
+      return (
+        date1.getFullYear() === date2.getFullYear() &&
+        date1.getMonth() === date2.getMonth() &&
+        date1.getDate() === date2.getDate()
+      )
+    }
+
+    const exists = store.renungan.some((r) => {
+      const dStr = r.tanggal_tayang || r.date || r.tanggal
+      if (!dStr) return false
+      const rDate = new Date(dStr)
+      return !isNaN(rDate.getTime()) && isSameDate(rDate, d)
+    })
+
+    const isToday = i === 0
+    const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
+
+    chartData.push({
+      id: i,
+      label: isToday ? 'Hari Ini' : dayNames[d.getDay()],
+      dateLabel: `${d.getDate()}/${d.getMonth() + 1}`,
+      isToday,
+      hasRenungan: exists,
+    })
+  }
+  return chartData
 })
 
 const handleLogout = () => {

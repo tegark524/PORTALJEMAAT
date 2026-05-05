@@ -8,13 +8,13 @@
           v-model="searchQuery"
           type="text"
           placeholder="Cari judul warta..."
-          class="flex-1 md:w-64 border border-[#d6d3d1] rounded-full px-4 py-2 text-[14px] focus:outline-none focus:border-[#292524]"
+          class="flex-1 md:w-64 border border-[#d6d3d1] rounded-full px-4 py-2 text-[14px] focus:outline-none focus:border-[#800000] focus:ring-1 focus:ring-[#800000]"
         />
         <button
           @click="openModal()"
-          class="bg-[#292524] text-[#ffffff] px-5 py-2 rounded-full text-[15px] font-medium hover:bg-[#0c0a09] transition-colors shrink-0"
+          class="bg-[#800000] text-[#ffffff] px-5 py-2 rounded-full text-[15px] font-medium hover:bg-[#500000] shadow-md transition-all shrink-0"
         >
-          + Tambah Data
+          + Tambah Warta
         </button>
       </div>
     </div>
@@ -161,7 +161,7 @@
                 v-model="form.tanggal"
                 type="date"
                 required
-                class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2 text-[14px] focus:outline-none focus:border-[#292524]"
+                class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2 text-[14px] focus:outline-none focus:border-[#800000] focus:ring-1 focus:ring-[#800000]"
               />
             </div>
             <div>
@@ -170,7 +170,7 @@
                 v-model="form.kategori"
                 type="text"
                 placeholder="Misal: Warta Umum"
-                class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2 text-[14px] focus:outline-none focus:border-[#292524]"
+                class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2 text-[14px] focus:outline-none focus:border-[#800000] focus:ring-1 focus:ring-[#800000]"
               />
             </div>
           </div>
@@ -181,7 +181,7 @@
               type="text"
               required
               placeholder="Masukkan judul..."
-              class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2 text-[14px] focus:outline-none focus:border-[#292524]"
+              class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2 text-[14px] focus:outline-none focus:border-[#800000] focus:ring-1 focus:ring-[#800000]"
             />
           </div>
           <div>
@@ -190,7 +190,7 @@
               v-model="form.isi"
               rows="6"
               required
-              class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2 text-[14px] focus:outline-none focus:border-[#292524]"
+              class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2 text-[14px] focus:outline-none focus:border-[#800000] focus:ring-1 focus:ring-[#800000]"
             ></textarea>
           </div>
           <div>
@@ -201,7 +201,7 @@
               type="file"
               accept="image/*"
               @change="handleImageUpload"
-              class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2 text-[14px] focus:outline-none focus:border-[#292524]"
+              class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2 text-[14px] focus:outline-none focus:border-[#800000] focus:ring-1 focus:ring-[#800000]"
             />
             <div
               v-if="isUploading"
@@ -231,7 +231,7 @@
               id="isHeadline"
               v-model="form.is_headline"
               type="checkbox"
-              class="w-4 h-4 text-[#292524] bg-white border-[#d6d3d1] rounded focus:ring-[#292524]"
+              class="w-4 h-4 text-[#800000] bg-white border-[#d6d3d1] rounded focus:ring-[#800000]"
             />
             <label for="isHeadline" class="text-[13px] font-semibold text-[#4e4e4e] cursor-pointer">
               Jadikan Warta Headline
@@ -249,7 +249,7 @@
             <button
               type="submit"
               :disabled="isSubmitting || isUploading"
-              class="bg-[#292524] text-[#ffffff] px-5 py-2 rounded-full text-[15px] font-medium hover:bg-[#0c0a09] disabled:opacity-50 transition-colors w-36 flex justify-center items-center"
+              class="bg-[#800000] text-[#ffffff] px-5 py-2 rounded-full text-[15px] font-medium hover:bg-[#500000] shadow-md disabled:opacity-50 transition-colors w-36 flex justify-center items-center"
             >
               <div
                 v-if="isSubmitting"
