@@ -124,6 +124,14 @@
               >Kelola Doa</router-link
             >
           </nav>
+          <div class="p-4 border-t border-[#1c1917]">
+            <button
+              @click="handleLogout"
+              class="w-full bg-[#1c1917] text-[#ffffff] px-4 py-2.5 rounded-full text-[15px] font-medium hover:bg-[#ffffff] hover:text-[#0c0a09] transition-colors"
+            >
+              Keluar
+            </button>
+          </div>
         </aside>
       </div>
     </transition>
@@ -176,12 +184,6 @@
               ></path>
             </svg>
           </a>
-          <button
-            @click="handleLogout"
-            class="md:hidden bg-[#292524] text-[#ffffff] px-4 py-1.5 rounded-full text-[13px] font-medium"
-          >
-            Keluar
-          </button>
         </div>
       </header>
 

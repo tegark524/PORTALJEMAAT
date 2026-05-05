@@ -89,8 +89,27 @@
                     @click="handleDelete(item.id)"
                     class="p-2 bg-[#fee2e2] text-[#dc2626] hover:bg-[#fecaca] hover:text-[#991b1b] rounded-md transition-colors"
                     title="Hapus Data"
+                    :disabled="isDeleting === item.id"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div
+                      v-if="isDeleting === item.id"
+                      class="flex flex-row gap-0.5 justify-center items-center w-4 h-4"
+                    >
+                      <div class="w-1 h-1 rounded-full bg-current animate-bounce"></div>
+                      <div
+                        class="w-1 h-1 rounded-full bg-current animate-bounce [animation-delay:-.3s]"
+                      ></div>
+                      <div
+                        class="w-1 h-1 rounded-full bg-current animate-bounce [animation-delay:-.5s]"
+                      ></div>
+                    </div>
+                    <svg
+                      v-else
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -104,7 +123,19 @@
             </tr>
             <tr v-if="!filteredWarta.length">
               <td colspan="4" class="p-8 text-center text-[#777169]">
-                Data warta tidak ditemukan.
+                <div v-if="store.isLoading" class="flex flex-col items-center justify-center gap-3">
+                  <div class="flex flex-row gap-2">
+                    <div class="w-3 h-3 rounded-full bg-[#800000] animate-bounce"></div>
+                    <div
+                      class="w-3 h-3 rounded-full bg-[#800000] animate-bounce [animation-delay:-.3s]"
+                    ></div>
+                    <div
+                      class="w-3 h-3 rounded-full bg-[#800000] animate-bounce [animation-delay:-.5s]"
+                    ></div>
+                  </div>
+                  <span class="text-[14px]">Memuat data warta...</span>
+                </div>
+                <span v-else>Data warta tidak ditemukan.</span>
               </td>
             </tr>
           </tbody>
@@ -172,8 +203,20 @@
               @change="handleImageUpload"
               class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2 text-[14px] focus:outline-none focus:border-[#292524]"
             />
-            <div v-if="isUploading" class="text-[12px] text-[#f59e0b] mt-1 font-medium">
-              Sedang mengunggah gambar ke server...
+            <div
+              v-if="isUploading"
+              class="text-[12px] text-[#f59e0b] mt-1 font-medium flex items-center gap-2"
+            >
+              <div class="flex flex-row gap-1">
+                <div class="w-1 h-1 rounded-full bg-[#f59e0b] animate-bounce"></div>
+                <div
+                  class="w-1 h-1 rounded-full bg-[#f59e0b] animate-bounce [animation-delay:-.3s]"
+                ></div>
+                <div
+                  class="w-1 h-1 rounded-full bg-[#f59e0b] animate-bounce [animation-delay:-.5s]"
+                ></div>
+              </div>
+              Sedang mengunggah gambar...
             </div>
             <div
               v-if="form.url_gambar && !isUploading"
@@ -206,9 +249,21 @@
             <button
               type="submit"
               :disabled="isSubmitting || isUploading"
-              class="bg-[#292524] text-[#ffffff] px-5 py-2 rounded-full text-[15px] font-medium hover:bg-[#0c0a09] disabled:opacity-50 transition-colors"
+              class="bg-[#292524] text-[#ffffff] px-5 py-2 rounded-full text-[15px] font-medium hover:bg-[#0c0a09] disabled:opacity-50 transition-colors w-36 flex justify-center items-center"
             >
-              {{ isSubmitting ? 'Menyimpan...' : 'Simpan Data' }}
+              <div
+                v-if="isSubmitting"
+                class="flex flex-row gap-1.5 justify-center items-center h-6"
+              >
+                <div class="w-1.5 h-1.5 rounded-full bg-white animate-bounce"></div>
+                <div
+                  class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-.3s]"
+                ></div>
+                <div
+                  class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-.5s]"
+                ></div>
+              </div>
+              <span v-else>Simpan Data</span>
             </button>
           </div>
         </form>
@@ -246,6 +301,7 @@ const showModal = ref(false)
 const isEdit = ref(false)
 const isSubmitting = ref(false)
 const isUploading = ref(false)
+const isDeleting = ref(null)
 
 const toast = ref({ show: false, message: '', type: 'success' })
 const showToast = (msg, type = 'success') => {
@@ -395,11 +451,14 @@ const handleSave = async () => {
 
 const handleDelete = async (id) => {
   if (!confirm('Yakin ingin menghapus data warta ini? Tindakan ini tidak dapat dibatalkan.')) return
+  isDeleting.value = id
   try {
     await store.submitGasAction('delete', 'tb_warta', null, id)
     showToast('Data berhasil dihapus.')
   } catch (err) {
     showToast(err.message, 'error')
+  } finally {
+    isDeleting.value = null
   }
 }
 </script>

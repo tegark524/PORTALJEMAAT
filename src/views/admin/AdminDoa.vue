@@ -91,7 +91,19 @@
                   "
                   :disabled="isUpdating === item.id"
                 >
-                  {{ item.status === 'Sudah Ditangani' ? 'Selesai' : 'Belum' }}
+                  <div
+                    v-if="isUpdating === item.id"
+                    class="flex flex-row gap-1 justify-center items-center h-3.5"
+                  >
+                    <div class="w-1 h-1 rounded-full bg-current animate-bounce"></div>
+                    <div
+                      class="w-1 h-1 rounded-full bg-current animate-bounce [animation-delay:-.3s]"
+                    ></div>
+                    <div
+                      class="w-1 h-1 rounded-full bg-current animate-bounce [animation-delay:-.5s]"
+                    ></div>
+                  </div>
+                  <span v-else>{{ item.status === 'Sudah Ditangani' ? 'Selesai' : 'Belum' }}</span>
                 </button>
               </td>
               <td class="p-4 border-b border-[#e7e5e4] align-middle whitespace-nowrap">
@@ -114,8 +126,27 @@
                     @click="deleteDoa(item.id)"
                     class="p-2 bg-[#fee2e2] text-[#dc2626] hover:bg-[#fecaca] hover:text-[#991b1b] rounded-md transition-colors"
                     title="Hapus Data"
+                    :disabled="isDeleting === item.id"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div
+                      v-if="isDeleting === item.id"
+                      class="flex flex-row gap-0.5 justify-center items-center w-4 h-4"
+                    >
+                      <div class="w-1 h-1 rounded-full bg-current animate-bounce"></div>
+                      <div
+                        class="w-1 h-1 rounded-full bg-current animate-bounce [animation-delay:-.3s]"
+                      ></div>
+                      <div
+                        class="w-1 h-1 rounded-full bg-current animate-bounce [animation-delay:-.5s]"
+                      ></div>
+                    </div>
+                    <svg
+                      v-else
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -128,7 +159,21 @@
               </td>
             </tr>
             <tr v-if="!filteredDoa.length">
-              <td colspan="6" class="p-8 text-center text-[#777169]">Belum ada permohonan doa.</td>
+              <td colspan="6" class="p-8 text-center text-[#777169]">
+                <div v-if="store.isLoading" class="flex flex-col items-center justify-center gap-3">
+                  <div class="flex flex-row gap-2">
+                    <div class="w-3 h-3 rounded-full bg-[#800000] animate-bounce"></div>
+                    <div
+                      class="w-3 h-3 rounded-full bg-[#800000] animate-bounce [animation-delay:-.3s]"
+                    ></div>
+                    <div
+                      class="w-3 h-3 rounded-full bg-[#800000] animate-bounce [animation-delay:-.5s]"
+                    ></div>
+                  </div>
+                  <span class="text-[14px]">Memuat data doa...</span>
+                </div>
+                <span v-else>Belum ada permohonan doa.</span>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -278,9 +323,21 @@
             <button
               type="submit"
               :disabled="isSubmitting"
-              class="bg-[#800000] text-[#ffffff] px-5 py-2 rounded-full text-[15px] font-medium hover:bg-[#500000] disabled:opacity-50 transition-colors shadow-md"
+              class="bg-[#800000] text-[#ffffff] px-5 py-2 rounded-full text-[15px] font-medium hover:bg-[#500000] disabled:opacity-50 transition-colors shadow-md w-36 flex justify-center items-center"
             >
-              {{ isSubmitting ? 'Menyimpan...' : 'Simpan Data' }}
+              <div
+                v-if="isSubmitting"
+                class="flex flex-row gap-1.5 justify-center items-center h-6"
+              >
+                <div class="w-1.5 h-1.5 rounded-full bg-white animate-bounce"></div>
+                <div
+                  class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-.3s]"
+                ></div>
+                <div
+                  class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-.5s]"
+                ></div>
+              </div>
+              <span v-else>Simpan Data</span>
             </button>
           </div>
         </form>
@@ -317,6 +374,7 @@ const isUpdating = ref(null)
 const showModal = ref(false)
 const isSubmitting = ref(false)
 const isEdit = ref(false)
+const isDeleting = ref(null)
 
 const form = ref({
   id: '',
@@ -458,11 +516,14 @@ const handleSave = async () => {
 
 const deleteDoa = async (id) => {
   if (!confirm('Yakin ingin menghapus permohonan doa ini?')) return
+  isDeleting.value = id
   try {
     await store.submitGasAction('delete', 'tb_request', null, id)
     showToast('Permohonan doa dihapus.')
   } catch (err) {
     showToast(err.message, 'error')
+  } finally {
+    isDeleting.value = null
   }
 }
 </script>

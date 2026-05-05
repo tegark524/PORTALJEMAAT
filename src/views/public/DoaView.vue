@@ -136,9 +136,18 @@
           <button
             type="submit"
             :disabled="isSubmitting"
-            class="w-full bg-[#800000] text-white px-6 py-3.5 rounded-full text-[15px] font-bold hover:bg-[#500000] disabled:opacity-50 transition-colors shadow-md"
+            class="w-full bg-[#800000] text-white px-6 py-3.5 rounded-full text-[15px] font-bold hover:bg-[#500000] disabled:opacity-50 transition-colors shadow-md flex justify-center items-center h-12"
           >
-            {{ isSubmitting ? 'Mengirim...' : 'Kirim Pokok Doa' }}
+            <div v-if="isSubmitting" class="flex flex-row gap-2 justify-center items-center">
+              <div class="w-2 h-2 rounded-full bg-white animate-bounce"></div>
+              <div
+                class="w-2 h-2 rounded-full bg-white animate-bounce [animation-delay:-.3s]"
+              ></div>
+              <div
+                class="w-2 h-2 rounded-full bg-white animate-bounce [animation-delay:-.5s]"
+              ></div>
+            </div>
+            <span v-else>Kirim Pokok Doa</span>
           </button>
           <p v-if="errorMsg" class="text-[#dc2626] text-[14px] mt-2 text-center">{{ errorMsg }}</p>
         </div>
