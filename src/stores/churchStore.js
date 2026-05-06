@@ -9,6 +9,15 @@ const formatTanggal = (rawDate) => {
   return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
+// Helper proxy untuk mem-bypass blokir ISP Indonesia (Internet Positif) terhadap ImgBB
+const getProxiedImage = (url) => {
+  if (!url) return ''
+  if (url.includes('i.ibb.co') || url.includes('imgbb.com')) {
+    return `https://wsrv.nl/?url=${encodeURIComponent(url)}`
+  }
+  return url
+}
+
 export const useChurchStore = defineStore('church', {
   state: () => ({
     warta: [],
@@ -39,6 +48,7 @@ export const useChurchStore = defineStore('church', {
         this.warta = wartaRaw.map((item) => ({
           ...item,
           gambar: item.url_gambar || item.gambar, // Fallback untuk komponen WartaList & WartaHero
+          display_gambar: getProxiedImage(item.url_gambar || item.gambar), // Proxy aman anti-blokir
           formattedDate: formatTanggal(item.tanggal || item.date),
         }))
 
@@ -47,6 +57,7 @@ export const useChurchStore = defineStore('church', {
         this.jadwal = jadwalRaw.map((item) => ({
           ...item,
           gambar: item.url_gambar || item.gambar, // Fallback gambar jadwal
+          display_gambar: getProxiedImage(item.url_gambar || item.gambar),
         }))
 
         const doaRaw = d.data?.data || d.data || []
@@ -89,6 +100,7 @@ export const useChurchStore = defineStore('church', {
         this.warta = wartaRaw.map((item) => ({
           ...item,
           gambar: item.url_gambar || item.gambar, // Fallback untuk komponen WartaList & WartaHero
+          display_gambar: getProxiedImage(item.url_gambar || item.gambar),
           formattedDate: formatTanggal(item.tanggal || item.date),
         }))
 
@@ -97,6 +109,7 @@ export const useChurchStore = defineStore('church', {
         this.jadwal = jadwalRaw.map((item) => ({
           ...item,
           gambar: item.url_gambar || item.gambar, // Fallback gambar jadwal
+          display_gambar: getProxiedImage(item.url_gambar || item.gambar),
         }))
 
         const doaRaw = d.data?.data || d.data || []

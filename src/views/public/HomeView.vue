@@ -599,7 +599,7 @@ const combinedHeadlines = computed(() => {
         label: 'Warta Penting',
         title: w.judul || w.title,
         date: w.tanggal || w.date,
-        image: w.url_gambar || w.gambar,
+        image: w.display_gambar || w.url_gambar || w.gambar,
         desc: w.isi || w.isi_lengkap || w.content || w.ringkasan,
         raw: w,
       })
@@ -618,7 +618,7 @@ const combinedHeadlines = computed(() => {
         location: j.lokasi,
         desc: j.keterangan,
         link: j.link,
-        image: j.url_gambar || j.gambar, // Fallback gambar jadwal
+        image: j.display_gambar || j.url_gambar || j.gambar, // Fallback gambar jadwal
         raw: j,
       })
     }
@@ -633,7 +633,7 @@ const combinedHeadlines = computed(() => {
       label: 'Warta Terbaru',
       title: w.judul || w.title,
       date: w.tanggal || w.date,
-      image: w.url_gambar || w.gambar,
+      image: w.display_gambar || w.url_gambar || w.gambar,
       desc: w.isi || w.isi_lengkap || w.content || w.ringkasan,
       raw: w,
     })
