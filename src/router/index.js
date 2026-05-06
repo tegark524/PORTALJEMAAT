@@ -2,6 +2,34 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/public/HomeView.vue'
 import { useChurchStore } from '../stores/churchStore'
 
+// Navigation Guard untuk memblokir akses ke fitur voting jika statusnya sedang tidak aktif
+const requireVotingActive = async (to, from, next) => {
+  const store = useChurchStore()
+  if (!store.votingConfig) {
+    await store.fetchVotingConfig()
+  }
+  const activeConfig = store.votingConfig?.is_active
+  const isVotingActive =
+    activeConfig === true ||
+    activeConfig === 'TRUE' ||
+    String(activeConfig).toLowerCase() === 'true'
+  if (!isVotingActive) {
+    next(to.path.startsWith('/admin') ? '/admin' : '/')
+  } else {
+    next()
+  }
+}
+
+// Navigation Guard untuk memblokir akses KPU (Hak Akses Spesial)
+const requireKPU = (to, from, next) => {
+  const store = useChurchStore()
+  if (!store.isKPU) {
+    next('/admin') // Lempar kembali ke halaman depan Admin
+  } else {
+    next()
+  }
+}
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   scrollBehavior(to, from, savedPosition) {
@@ -71,7 +99,49 @@ const router = createRouter({
           component: () => import('@/views/admin/AdminDoa.vue'),
           meta: { title: 'Moderasi Doa' },
         },
+        {
+          path: 'voter',
+          name: 'admin-voter',
+          component: () => import('@/views/admin/VoterManager.vue'),
+          meta: { title: 'Manajemen Pemilih' },
+          beforeEnter: [requireVotingActive, requireKPU],
+        },
+        {
+          path: 'kandidat',
+          name: 'admin-kandidat',
+          component: () => import('@/views/admin/KandidatManager.vue'),
+          meta: { title: 'Kelola Kandidat' },
+          beforeEnter: [requireVotingActive, requireKPU],
+        },
+        {
+          path: 'voting-config',
+          name: 'admin-voting-config',
+          component: () => import('@/views/admin/VotingConfigManager.vue'),
+          meta: { title: 'Konfigurasi Voting' },
+          beforeEnter: requireKPU,
+        },
+        {
+          path: 'live-count',
+          name: 'admin-live-count',
+          component: () => import('@/views/admin/LiveCount.vue'),
+          meta: { title: 'Live Count Pemilihan' },
+          beforeEnter: [requireVotingActive, requireKPU],
+        },
       ],
+    },
+    {
+      path: '/voting/login',
+      name: 'voting-login',
+      component: () => import('@/views/voting/LoginView.vue'),
+      meta: { title: 'Login Bilik Suara' },
+      beforeEnter: requireVotingActive,
+    },
+    {
+      path: '/voting/dashboard',
+      name: 'voting-dashboard',
+      component: () => import('@/views/voting/DashboardView.vue'),
+      meta: { title: 'Bilik Suara Digital' },
+      beforeEnter: requireVotingActive,
     },
   ],
 })

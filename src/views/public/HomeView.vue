@@ -458,11 +458,15 @@
 
               <!-- Gambar Warta di dalam Modal Detail -->
               <div
-                v-if="selectedItem?.url_gambar || selectedItem?.gambar"
+                v-if="
+                  selectedItem?.display_gambar || selectedItem?.url_gambar || selectedItem?.gambar
+                "
                 class="mb-6 rounded-xl overflow-hidden shadow-sm border border-[#e7e5e4]"
               >
                 <img
-                  :src="selectedItem?.url_gambar || selectedItem?.gambar"
+                  :src="
+                    selectedItem?.display_gambar || selectedItem?.url_gambar || selectedItem?.gambar
+                  "
                   alt="Media Warta"
                   class="w-full h-auto max-h-[400px] object-cover"
                 />
@@ -510,6 +514,16 @@ const searchQuery = ref('')
 const isModalOpen = ref(false)
 const selectedItem = ref(null)
 const showAllRenungan = ref(false)
+
+onMounted(() => {
+  document.title = 'GKJW Sukolilo | Beranda Jemaat'
+  const metaDesc = document.querySelector('meta[name="description"]')
+  if (metaDesc)
+    metaDesc.setAttribute(
+      'content',
+      'Website resmi Gereja Kristen Jawi Wetan (GKJW) Jemaat Sukolilo. Temukan jadwal ibadah, renungan harian, dan warta jemaat terbaru.',
+    )
+})
 
 // --- Warta Logic ---
 // Sort data by date descending

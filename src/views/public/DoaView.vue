@@ -107,30 +107,27 @@
           <!-- Opsi Tampil di Publik -->
           <div
             v-if="form.jenis_layanan === 'Permohonan Doa'"
-            class="flex items-center justify-between gap-4 bg-[#faf7f2] p-5 rounded-xl border border-[#e7e5e4]"
+            class="flex items-start gap-3 bg-[#faf7f2] p-5 rounded-xl border border-[#e7e5e4]"
           >
+            <div class="pt-0.5 shrink-0">
+              <input
+                type="checkbox"
+                id="izin_publik"
+                v-model="form.izin_publik"
+                class="w-5 h-5 text-[#800000] border-[#d6d3d1] rounded focus:ring-[#800000] cursor-pointer"
+              />
+            </div>
             <div>
-              <h4 class="text-[14px] font-bold text-[#0c0a09] mb-1">
+              <label
+                for="izin_publik"
+                class="text-[14px] font-bold text-[#0c0a09] mb-1 cursor-pointer block"
+              >
                 Bersedia di Unggah ke Tembok Doa?
-              </h4>
+              </label>
               <p class="text-[13px] text-[#4e4e4e] leading-tight">
                 Saya mengizinkan pokok doa ini ditampilkan secara publik.
-                <span class="block text-[#777169] text-[12px] mt-1 font-medium">
-                  (Nama akan otomatis diinisialkan oleh Majelis).
-                </span>
               </p>
             </div>
-            <button
-              type="button"
-              @click="form.izin_publik = !form.izin_publik"
-              class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
-              :class="form.izin_publik ? 'bg-[#800000]' : 'bg-[#d6d3d1]'"
-            >
-              <span
-                class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                :class="form.izin_publik ? 'translate-x-5' : 'translate-x-0'"
-              ></span>
-            </button>
           </div>
 
           <button

@@ -358,5 +358,12 @@ onMounted(() => {
       }, 100)
     }
   }
+  document.title = 'Tentang Kami | GKJW Sukolilo'
+  const metaDesc = document.querySelector('meta[name="description"]')
+  if (metaDesc)
+    metaDesc.setAttribute(
+      'content',
+      'Sejarah pelayanan, jadwal ibadah rutin, struktur organisasi, dan kontak resmi GKJW Jemaat Sukolilo Surabaya.',
+    )
 })
 </script>

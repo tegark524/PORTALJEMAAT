@@ -128,32 +128,52 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { useChurchStore } from '@/stores/churchStore'
 
 const route = useRoute()
 const isMobileMenuOpen = ref(false)
+const store = useChurchStore()
+
+onMounted(() => {
+  store.fetchVotingConfig()
+})
 
 // Struktur navigasi modular (Kunci penyelesaian Link Stacking)
-const navLinks = [
-  { name: 'Beranda', path: '/', hash: '#beranda' },
-  { name: 'Renungan', path: '/', hash: '#renungan' },
-  { name: 'Jadwal', path: '/', hash: '#jadwal' },
-  { name: 'Warta', path: '/', hash: '#warta-list' },
-  {
-    name: 'Tentang Kami',
-    path: '/tentang',
-    hash: '',
-    dropdown: [
-      { name: 'Sejarah Gereja', path: '/tentang', hash: '#sejarah' },
-      { name: 'Jadwal Pelayanan', path: '/tentang', hash: '#jadwal-pelayanan' },
-      { name: 'Struktur Organisasi', path: '/tentang', hash: '#organisasi' },
-      { name: 'Donasi & Persembahan', path: '/tentang', hash: '#donasi' },
-      { name: 'Hubungi Kami', path: '/tentang', hash: '#kontak' },
-    ],
-  },
-  { name: 'Layanan Doa', path: '/doa', hash: '' },
-]
+const navLinks = computed(() => {
+  const links = [
+    { name: 'Beranda', path: '/', hash: '#beranda' },
+    { name: 'Renungan', path: '/', hash: '#renungan' },
+    { name: 'Jadwal', path: '/', hash: '#jadwal' },
+    { name: 'Warta', path: '/', hash: '#warta-list' },
+    {
+      name: 'Tentang Kami',
+      path: '/tentang',
+      hash: '',
+      dropdown: [
+        { name: 'Sejarah Gereja', path: '/tentang', hash: '#sejarah' },
+        { name: 'Jadwal Pelayanan', path: '/tentang', hash: '#jadwal-pelayanan' },
+        { name: 'Struktur Organisasi', path: '/tentang', hash: '#organisasi' },
+        { name: 'Donasi & Persembahan', path: '/tentang', hash: '#donasi' },
+        { name: 'Hubungi Kami', path: '/tentang', hash: '#kontak' },
+      ],
+    },
+    { name: 'Layanan Doa', path: '/doa', hash: '' },
+  ]
+
+  const activeConfig = store.votingConfig?.is_active
+  const isVotingActive =
+    activeConfig === true ||
+    activeConfig === 'TRUE' ||
+    String(activeConfig).toLowerCase() === 'true'
+
+  if (isVotingActive) {
+    links.push({ name: 'Voting Majelis', path: '/voting/login', hash: '' })
+  }
+
+  return links
+})
 
 // Resolusi path absolute untuk mem-bypass URL stacking (seperti /doa#warta)
 const getToLocation = (link) => {

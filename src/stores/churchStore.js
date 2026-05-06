@@ -24,12 +24,29 @@ export const useChurchStore = defineStore('church', {
     renungan: [],
     jadwal: [],
     doa: [],
+    kandidat: [], // State untuk Kandidat Voting
+    votingConfig: null, // State untuk Konfigurasi Voting
+    voters: [], // State untuk Admin: Data Jemaat Pemilih
+    suara: [], // State untuk Admin: Data Suara Masuk
     isLoading: false,
     isLoaded: false,
     isAuthenticated: false,
     user: null,
+
+    // State spesifik untuk sistem Voting
+    voterSession: null,
     lastUpdated: null,
   }),
+  getters: {
+    isKPU: (state) => {
+      if (!state.user || !state.user.email) return false
+      const kpuEmails = (import.meta.env.VITE_KPU_EMAILS || '')
+        .toLowerCase()
+        .split(',')
+        .map((e) => e.trim())
+      return kpuEmails.includes(state.user.email.toLowerCase()) || kpuEmails.includes('*')
+    },
+  },
   actions: {
     async initializeHomeData() {
       if (this.isLoaded) return // "Load Once" Strategy
@@ -237,6 +254,118 @@ export const useChurchStore = defineStore('church', {
       this.isAuthenticated = false
       this.user = null
       localStorage.removeItem('gkjw_session')
+    },
+
+    // ============================================
+    // MODULE VOTING (Sistem Pemilihan)
+    // ============================================
+
+    // Fetch konfigurasi utama (judul, status aktif)
+    async fetchVotingConfig() {
+      const url = import.meta.env.VITE_GAS_API_URL
+      try {
+        const response = await axios.get(`${url}?table=tb_voting_config&mode=public`)
+        const data = response.data?.data || response.data || []
+        this.votingConfig = data.length > 0 ? data[0] : null
+      } catch (err) {
+        console.error('Gagal memuat konfigurasi voting:', err)
+      }
+    },
+
+    // Fetch data pemilih untuk Admin
+    async fetchVoters() {
+      const url = import.meta.env.VITE_GAS_API_URL
+      try {
+        const response = await axios.get(`${url}?table=tb_voter`)
+        this.voters = response.data?.data || response.data || []
+      } catch (err) {
+        console.error('Gagal memuat daftar pemilih:', err)
+      }
+    },
+
+    // Fetch data suara untuk Live Count Admin
+    async fetchSuara() {
+      const url = import.meta.env.VITE_GAS_API_URL
+      try {
+        const response = await axios.get(`${url}?table=tb_suara`)
+        this.suara = response.data?.data || response.data || []
+      } catch (err) {
+        console.error('Gagal memuat daftar suara:', err)
+      }
+    },
+
+    checkVoterAuth() {
+      const session = localStorage.getItem('gkjw_voter_session')
+      if (session) {
+        try {
+          this.voterSession = JSON.parse(session)
+        } catch (e) {
+          this.logoutVoter()
+        }
+      }
+    },
+
+    async fetchKandidat() {
+      const url = import.meta.env.VITE_GAS_API_URL
+      try {
+        const response = await axios.get(`${url}?table=tb_kandidat&mode=public`)
+        this.kandidat = response.data?.data || response.data || []
+      } catch (err) {
+        console.error('Gagal memuat daftar kandidat:', err)
+      }
+    },
+
+    async verifyVoter(voterId) {
+      const url = import.meta.env.VITE_GAS_API_URL
+      try {
+        const response = await axios.post(
+          url,
+          JSON.stringify({ action: 'verify_voter', voter_id: voterId }),
+          { headers: { 'Content-Type': 'text/plain' } },
+        )
+        if (response.data && response.data.status === 'success') {
+          this.voterSession = response.data.voter
+          localStorage.setItem('gkjw_voter_session', JSON.stringify(this.voterSession))
+          return { success: true }
+        } else {
+          throw new Error(response.data?.message || 'Gagal memverifikasi data jemaat.')
+        }
+      } catch (error) {
+        throw new Error(
+          error.response?.data?.message || error.message || 'Terjadi kesalahan jaringan.',
+        )
+      }
+    },
+
+    async submitVote(candidateId) {
+      if (!this.voterSession) throw new Error('Sesi pemilih tidak ditemukan.')
+      const url = import.meta.env.VITE_GAS_API_URL
+      try {
+        const response = await axios.post(
+          url,
+          JSON.stringify({
+            action: 'submit_vote',
+            voter_id: this.voterSession.id,
+            candidate_id: candidateId,
+          }),
+          { headers: { 'Content-Type': 'text/plain' } },
+        )
+        if (response.data && response.data.status === 'success') {
+          this.logoutVoter() // Keamanan: Auto-logout dan hapus sesi setelah berhasil voting
+          return { success: true, message: response.data.message }
+        } else {
+          throw new Error(response.data?.message || 'Gagal merekam suara.')
+        }
+      } catch (error) {
+        throw new Error(
+          error.response?.data?.message || error.message || 'Terjadi kesalahan jaringan.',
+        )
+      }
+    },
+
+    logoutVoter() {
+      this.voterSession = null
+      localStorage.removeItem('gkjw_voter_session')
     },
   },
 })

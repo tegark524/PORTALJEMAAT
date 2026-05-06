@@ -1,7 +1,11 @@
 <template>
-  <div class="flex h-screen bg-[#f5f5f5] font-sans text-[#0c0a09] overflow-hidden">
+  <div
+    class="flex h-screen bg-[#f5f5f5] font-sans text-[#0c0a09] overflow-hidden print:h-auto print:bg-white print:overflow-visible"
+  >
     <!-- Sidebar (Desktop) -->
-    <aside class="w-64 bg-[#0c0a09] text-[#ffffff] flex-col hidden md:flex shrink-0 shadow-xl z-20">
+    <aside
+      class="w-64 bg-[#0c0a09] text-[#ffffff] flex-col hidden md:flex shrink-0 shadow-xl z-20 print:hidden"
+    >
       <div class="h-16 flex items-center px-6 border-b border-[#1c1917] shrink-0">
         <h1 class="font-serif text-[24px] font-light flex items-center gap-3">
           <img src="@/assets/logo.png" alt="Logo" class="h-8 w-auto brightness-0 invert" />
@@ -39,6 +43,39 @@
           class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
           >Kelola Doa</router-link
         >
+
+        <!-- Disembunyikan sepenuhnya dari Majelis Biasa -->
+        <template v-if="store.isKPU">
+          <div class="px-4 pt-4 pb-1 text-[11px] font-bold text-[#777169] uppercase tracking-wider">
+            Modul Voting
+          </div>
+          <router-link
+            to="/admin/voting-config"
+            active-class="bg-[#1c1917] text-[#ffffff]"
+            class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
+            >Konfigurasi Voting</router-link
+          >
+          <template v-if="isVotingActive">
+            <router-link
+              to="/admin/kandidat"
+              active-class="bg-[#1c1917] text-[#ffffff]"
+              class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
+              >Kelola Kandidat</router-link
+            >
+            <router-link
+              to="/admin/voter"
+              active-class="bg-[#1c1917] text-[#ffffff]"
+              class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
+              >Manajemen Pemilih</router-link
+            >
+            <router-link
+              to="/admin/live-count"
+              active-class="bg-[#1c1917] text-[#ffffff]"
+              class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
+              >Live Count</router-link
+            >
+          </template>
+        </template>
       </nav>
       <div class="p-4 border-t border-[#1c1917]">
         <button
@@ -123,6 +160,44 @@
               class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
               >Kelola Doa</router-link
             >
+
+            <template v-if="store.isKPU">
+              <div
+                class="px-4 pt-4 pb-1 text-[11px] font-bold text-[#777169] uppercase tracking-wider"
+              >
+                Modul Voting
+              </div>
+              <router-link
+                @click="isMobileMenuOpen = false"
+                to="/admin/voting-config"
+                active-class="bg-[#1c1917] text-[#ffffff]"
+                class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
+                >Konfigurasi Voting</router-link
+              >
+              <template v-if="isVotingActive">
+                <router-link
+                  @click="isMobileMenuOpen = false"
+                  to="/admin/kandidat"
+                  active-class="bg-[#1c1917] text-[#ffffff]"
+                  class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
+                  >Kelola Kandidat</router-link
+                >
+                <router-link
+                  @click="isMobileMenuOpen = false"
+                  to="/admin/voter"
+                  active-class="bg-[#1c1917] text-[#ffffff]"
+                  class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
+                  >Manajemen Pemilih</router-link
+                >
+                <router-link
+                  @click="isMobileMenuOpen = false"
+                  to="/admin/live-count"
+                  active-class="bg-[#1c1917] text-[#ffffff]"
+                  class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
+                  >Live Count</router-link
+                >
+              </template>
+            </template>
           </nav>
           <div class="p-4 border-t border-[#1c1917]">
             <button
@@ -137,10 +212,12 @@
     </transition>
 
     <!-- Main Area -->
-    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+    <main
+      class="flex-1 flex flex-col h-screen overflow-hidden relative print:h-auto print:overflow-visible print:bg-white"
+    >
       <!-- Header -->
       <header
-        class="h-16 bg-[#f5f5f5] border-b border-[#e7e5e4] flex items-center justify-between px-6 shrink-0 shadow-sm z-10"
+        class="h-16 bg-[#f5f5f5] border-b border-[#e7e5e4] flex items-center justify-between px-6 shrink-0 shadow-sm z-10 print:hidden"
       >
         <div class="flex items-center gap-4">
           <button
@@ -188,7 +265,7 @@
       </header>
 
       <!-- Dynamic Content -->
-      <div class="flex-1 overflow-y-auto p-6 md:p-10">
+      <div class="flex-1 overflow-y-auto p-6 md:p-10 print:overflow-visible print:p-0">
         <div v-if="route.name === 'admin'">
           <div class="mb-10">
             <h1 class="font-serif text-[36px] font-light tracking-[-0.36px] text-[#0c0a09]">
@@ -354,7 +431,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useChurchStore } from '@/stores/churchStore'
 
@@ -362,6 +439,19 @@ const route = useRoute()
 const router = useRouter()
 const store = useChurchStore()
 const isMobileMenuOpen = ref(false)
+
+onMounted(() => {
+  store.fetchVotingConfig()
+})
+
+const isVotingActive = computed(() => {
+  const activeConfig = store.votingConfig?.is_active
+  return (
+    activeConfig === true ||
+    activeConfig === 'TRUE' ||
+    String(activeConfig).toLowerCase() === 'true'
+  )
+})
 
 const renunganStatus = computed(() => {
   const today = new Date()
