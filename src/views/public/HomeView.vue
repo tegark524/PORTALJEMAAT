@@ -488,8 +488,9 @@
       </transition>
     </Teleport>
 
-    <!-- Floating Prayer Widget (Dynamic Island Style - Mobile Only) -->
+    <!-- Floating Prayer Widget (Dynamic Island Style) -->
     <Teleport to="body">
+      <!-- KHUSUS MOBILE: Dynamic Island di Kanan Bawah -->
       <div class="fixed bottom-5 right-5 z-[90] md:hidden pointer-events-auto">
         <div
           class="bg-[#800000] text-white rounded-full shadow-2xl flex items-center overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] border-2 border-[#eab308]"
@@ -503,8 +504,7 @@
             <img
               src="https://img.icons8.com/fluent-systems-regular/96/ffffff/pray.png"
               alt="pray"
-              class="w-[26px] h-[26px] object-contain"
-              :class="showPrayerPopup ? 'animate-bounce' : 'animate-pulse'"
+              class="w-[26px] h-[26px] object-contain animate-pulse"
             />
           </router-link>
 
@@ -533,6 +533,68 @@
             </svg>
           </button>
         </div>
+      </div>
+
+      <!-- KHUSUS DESKTOP: Notifikasi Panah ke arah Navbar -->
+      <div
+        class="fixed top-[80px] z-[90] hidden md:flex pointer-events-auto transition-all duration-500"
+        :class="isVotingActive ? 'right-[15%] lg:right-[20%]' : 'right-[5%] lg:right-[10%]'"
+      >
+        <transition
+          appear
+          enter-active-class="transition duration-500 ease-out"
+          enter-from-class="-translate-y-4 opacity-0"
+          enter-to-class="translate-y-0 opacity-100"
+          leave-active-class="transition duration-300 ease-in"
+          leave-from-class="translate-y-0 opacity-100"
+          leave-to-class="-translate-y-4 opacity-0"
+        >
+          <div
+            v-if="showPrayerPopup"
+            class="bg-[#800000] text-white p-3 pr-12 rounded-xl shadow-2xl relative border-2 border-[#eab308]"
+          >
+            <!-- Segitiga Panah Menunjuk ke Atas -->
+            <div
+              class="absolute -top-3 right-[40px] w-0 h-0 border-l-[8px] border-r-[8px] border-b-[10px] border-transparent border-b-[#eab308]"
+            ></div>
+            <div
+              class="absolute -top-[9px] right-[41px] w-0 h-0 border-l-[7px] border-r-[7px] border-b-[9px] border-transparent border-b-[#800000] z-10"
+            ></div>
+
+            <div class="flex items-center gap-3">
+              <div
+                class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0 border border-white/20"
+              >
+                <img
+                  src="https://img.icons8.com/fluent-systems-regular/96/ffffff/pray.png"
+                  alt="pray"
+                  class="w-[22px] h-[22px] object-contain animate-pulse"
+                />
+              </div>
+              <div>
+                <p class="text-[14px] font-bold text-[#fef08a] leading-tight mb-0.5">
+                  Butuh didoakan?
+                </p>
+                <p class="text-[12px] text-white/90 font-medium">Klik menu Layanan Doa di atas</p>
+              </div>
+            </div>
+
+            <!-- Tombol Close Desktop -->
+            <button
+              @click.prevent="closePrayerPopup"
+              class="absolute top-1/2 -translate-y-1/2 right-2 w-8 h-8 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 rounded-full transition-colors"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </transition>
       </div>
     </Teleport>
   </main>
@@ -589,6 +651,7 @@ watch(
 )
 
 onMounted(() => {
+  store.fetchVotingConfig()
   document.title = 'GKJW Sukolilo | Beranda Jemaat'
   const metaDesc = document.querySelector('meta[name="description"]')
   if (metaDesc)
@@ -596,6 +659,15 @@ onMounted(() => {
       'content',
       'Website resmi Gereja Kristen Jawi Wetan (GKJW) Jemaat Sukolilo. Temukan jadwal ibadah, renungan harian, dan warta jemaat terbaru.',
     )
+})
+
+const isVotingActive = computed(() => {
+  const activeConfig = store.votingConfig?.is_active
+  return (
+    activeConfig === true ||
+    activeConfig === 'TRUE' ||
+    String(activeConfig).toLowerCase() === 'true'
+  )
 })
 
 // --- Warta Logic ---
