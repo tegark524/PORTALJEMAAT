@@ -258,7 +258,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useChurchStore } from '@/stores/churchStore'
 
 const store = useChurchStore()
@@ -282,6 +282,41 @@ const form = ref({
   penulis: '',
   created_at: '',
 })
+
+onMounted(() => {
+  const saved = localStorage.getItem('gkjw_renungan_form')
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved)
+      if (parsed.showModal) {
+        form.value = parsed.form
+        isEdit.value = parsed.isEdit
+        showModal.value = parsed.showModal
+      }
+    } catch (e) {
+      console.error('Error parsing saved form', e)
+    }
+  }
+})
+
+let debounceTimer = null
+watch(
+  [form, showModal, isEdit],
+  ([newForm, newShowModal, newIsEdit]) => {
+    if (debounceTimer) clearTimeout(debounceTimer)
+    debounceTimer = setTimeout(() => {
+      localStorage.setItem(
+        'gkjw_renungan_form',
+        JSON.stringify({
+          form: newForm,
+          showModal: newShowModal,
+          isEdit: newIsEdit,
+        }),
+      )
+    }, 500)
+  },
+  { deep: true },
+)
 
 const formatDate = (dateStr) => {
   if (!dateStr) return ''
@@ -361,6 +396,7 @@ const handleSave = async () => {
 
     await store.submitGasAction(action, 'tb_renungan', payloadData, rowId)
     showToast(`Data renungan berhasil di${isEdit.value ? 'perbarui' : 'tambah'}.`)
+    localStorage.removeItem('gkjw_renungan_form')
     closeModal()
   } catch (err) {
     showToast(err.message, 'error')

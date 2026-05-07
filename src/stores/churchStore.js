@@ -18,6 +18,23 @@ const getProxiedImage = (url) => {
   return url
 }
 
+// Helper untuk memparsing waktu (mengatasi format tanggal 1899 dari Google Sheets) khusus untuk pengurutan
+const parseWaktuForSort = (timeStr) => {
+  if (!timeStr) return '00:00'
+  if (typeof timeStr === 'string' && timeStr.includes('1899')) {
+    const d = new Date(timeStr)
+    if (!isNaN(d.getTime())) {
+      d.setMinutes(d.getMinutes() + 7)
+      d.setSeconds(d.getSeconds() + 12)
+      return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
+    }
+  }
+  if (typeof timeStr === 'string' && /^\d{2}:\d{2}/.test(timeStr)) {
+    return timeStr.substring(0, 5)
+  }
+  return String(timeStr).padStart(5, '0')
+}
+
 export const useChurchStore = defineStore('church', {
   state: () => ({
     warta: [],
@@ -64,18 +81,30 @@ export const useChurchStore = defineStore('church', {
         const wartaRaw = w.data?.data || w.data || []
         this.warta = wartaRaw.map((item) => ({
           ...item,
-          gambar: item.url_gambar || item.gambar, // Fallback untuk komponen WartaList & WartaHero
+          gambar: getProxiedImage(item.url_gambar || item.gambar), // Fallback untuk komponen WartaList & WartaHero
           display_gambar: getProxiedImage(item.url_gambar || item.gambar), // Proxy aman anti-blokir
           formattedDate: formatTanggal(item.tanggal || item.date),
         }))
 
         this.renungan = r.data?.data || r.data || []
         const jadwalRaw = j.data?.data || j.data || []
-        this.jadwal = jadwalRaw.map((item) => ({
-          ...item,
-          gambar: item.url_gambar || item.gambar, // Fallback gambar jadwal
-          display_gambar: getProxiedImage(item.url_gambar || item.gambar),
-        }))
+        this.jadwal = jadwalRaw
+          .map((item) => ({
+            ...item,
+            gambar: getProxiedImage(item.url_gambar || item.gambar), // Fallback gambar jadwal
+            display_gambar: getProxiedImage(item.url_gambar || item.gambar),
+          }))
+          .sort((a, b) => {
+            const dateA = new Date(a.tanggal || a.date || '1970-01-01')
+            const dateB = new Date(b.tanggal || b.date || '1970-01-01')
+            dateA.setHours(0, 0, 0, 0)
+            dateB.setHours(0, 0, 0, 0)
+
+            if (dateA.getTime() === dateB.getTime()) {
+              return parseWaktuForSort(a.waktu).localeCompare(parseWaktuForSort(b.waktu))
+            }
+            return dateA - dateB
+          })
 
         const doaRaw = d.data?.data || d.data || []
         this.doa = doaRaw.map((item) => ({
@@ -116,18 +145,30 @@ export const useChurchStore = defineStore('church', {
         const wartaRaw = w.data?.data || w.data || []
         this.warta = wartaRaw.map((item) => ({
           ...item,
-          gambar: item.url_gambar || item.gambar, // Fallback untuk komponen WartaList & WartaHero
+          gambar: getProxiedImage(item.url_gambar || item.gambar), // Fallback untuk komponen WartaList & WartaHero
           display_gambar: getProxiedImage(item.url_gambar || item.gambar),
           formattedDate: formatTanggal(item.tanggal || item.date),
         }))
 
         this.renungan = r.data?.data || r.data || []
         const jadwalRaw = j.data?.data || j.data || []
-        this.jadwal = jadwalRaw.map((item) => ({
-          ...item,
-          gambar: item.url_gambar || item.gambar, // Fallback gambar jadwal
-          display_gambar: getProxiedImage(item.url_gambar || item.gambar),
-        }))
+        this.jadwal = jadwalRaw
+          .map((item) => ({
+            ...item,
+            gambar: getProxiedImage(item.url_gambar || item.gambar), // Fallback gambar jadwal
+            display_gambar: getProxiedImage(item.url_gambar || item.gambar),
+          }))
+          .sort((a, b) => {
+            const dateA = new Date(a.tanggal || a.date || '1970-01-01')
+            const dateB = new Date(b.tanggal || b.date || '1970-01-01')
+            dateA.setHours(0, 0, 0, 0)
+            dateB.setHours(0, 0, 0, 0)
+
+            if (dateA.getTime() === dateB.getTime()) {
+              return parseWaktuForSort(a.waktu).localeCompare(parseWaktuForSort(b.waktu))
+            }
+            return dateA - dateB
+          })
 
         const doaRaw = d.data?.data || d.data || []
         this.doa = doaRaw.map((item) => ({

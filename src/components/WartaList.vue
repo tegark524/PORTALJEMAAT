@@ -32,7 +32,7 @@
           :key="index"
           @click="$emit('read-more', item)"
           class="relative bg-[#ffffff] border border-[#e7e5e4] rounded-[16px] overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer flex-col group min-h-[260px]"
-          :class="index >= 1 && !showAll ? 'hidden md:flex' : 'flex'"
+          :class="showAll ? 'flex' : index === 0 ? 'flex' : index < 3 ? 'hidden md:flex' : 'hidden'"
         >
           <!-- Background Image Handling -->
           <div v-if="item.gambar" class="absolute inset-0 w-full h-full z-0 overflow-hidden">
@@ -67,8 +67,12 @@
         </div>
       </div>
 
-      <!-- Tombol Selengkapnya (Hanya Mobile) -->
-      <div v-if="wartas.length > 1" class="mt-8 flex justify-center md:hidden">
+      <!-- Tombol Selengkapnya -->
+      <div
+        v-if="wartas.length > 1"
+        class="mt-8 flex justify-center"
+        :class="wartas.length <= 3 ? 'md:hidden' : ''"
+      >
         <button
           @click="showAll = !showAll"
           class="bg-transparent border border-[#d6d3d1] text-[#0c0a09] px-6 py-2.5 rounded-full text-[13px] font-bold hover:bg-[#f0efed] transition-colors"

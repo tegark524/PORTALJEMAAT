@@ -283,7 +283,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useChurchStore } from '@/stores/churchStore'
 
 const store = useChurchStore()
@@ -298,6 +298,47 @@ const isDeletingMass = ref(false)
 const showEditModal = ref(false)
 const isSavingEdit = ref(false)
 const editForm = ref({ id: '', nama: '', sudah_memilih: false })
+
+onMounted(() => {
+  store.fetchVoters()
+
+  const saved = localStorage.getItem('gkjw_voter_form')
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved)
+      if (parsed.showImportModal) {
+        pasteData.value = parsed.pasteData
+        showImportModal.value = parsed.showImportModal
+      }
+      if (parsed.showEditModal) {
+        editForm.value = parsed.editForm
+        showEditModal.value = parsed.showEditModal
+      }
+    } catch (e) {
+      console.error('Error parsing saved form', e)
+    }
+  }
+})
+
+let debounceTimer = null
+watch(
+  [showImportModal, pasteData, showEditModal, editForm],
+  ([newShowImportModal, newPasteData, newShowEditModal, newEditForm]) => {
+    if (debounceTimer) clearTimeout(debounceTimer)
+    debounceTimer = setTimeout(() => {
+      localStorage.setItem(
+        'gkjw_voter_form',
+        JSON.stringify({
+          showImportModal: newShowImportModal,
+          pasteData: newPasteData,
+          showEditModal: newShowEditModal,
+          editForm: newEditForm,
+        }),
+      )
+    }, 500)
+  },
+  { deep: true },
+)
 
 // Computed setter & getter untuk "Select All" checkbox
 const selectAll = computed({
@@ -327,6 +368,7 @@ const handleEditSave = async () => {
     // API Google Apps Script akan mencari ID ini dan mengganti datanya
     const payload = [editForm.value.id, editForm.value.nama, editForm.value.sudah_memilih]
     await store.submitGasAction('update', 'tb_voter', payload, editForm.value.id)
+    localStorage.removeItem('gkjw_voter_form')
     await store.fetchVoters() // Refresh data
     showEditModal.value = false
   } catch (err) {
@@ -340,10 +382,6 @@ const closeImportModal = () => {
   showImportModal.value = false
   pasteData.value = ''
 }
-
-onMounted(() => {
-  store.fetchVoters()
-})
 
 // Standarisasi format field "sudah_memilih" / "status"
 const hasVoted = (voter) => {
@@ -377,6 +415,7 @@ const handleImport = async () => {
 
     if (payloadData.length > 0) {
       await store.submitGasAction('bulk_insert', 'tb_voter', payloadData)
+      localStorage.removeItem('gkjw_voter_form')
       await store.fetchVoters() // Refresh data
       showImportModal.value = false
       pasteData.value = ''

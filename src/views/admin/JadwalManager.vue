@@ -347,7 +347,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import axios from 'axios'
 import { useChurchStore } from '@/stores/churchStore'
 
@@ -377,6 +377,41 @@ const form = ref({
   is_headline: false,
   url_gambar: '',
 })
+
+onMounted(() => {
+  const saved = localStorage.getItem('gkjw_jadwal_form')
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved)
+      if (parsed.showModal) {
+        form.value = parsed.form
+        isEdit.value = parsed.isEdit
+        showModal.value = parsed.showModal
+      }
+    } catch (e) {
+      console.error('Error parsing saved form', e)
+    }
+  }
+})
+
+let debounceTimer = null
+watch(
+  [form, showModal, isEdit],
+  ([newForm, newShowModal, newIsEdit]) => {
+    if (debounceTimer) clearTimeout(debounceTimer)
+    debounceTimer = setTimeout(() => {
+      localStorage.setItem(
+        'gkjw_jadwal_form',
+        JSON.stringify({
+          form: newForm,
+          showModal: newShowModal,
+          isEdit: newIsEdit,
+        }),
+      )
+    }, 500)
+  },
+  { deep: true },
+)
 
 const formatWaktu = (timeStr) => {
   if (!timeStr) return ''
@@ -536,6 +571,7 @@ const handleSave = async () => {
     ]
     await store.submitGasAction(action, 'tb_jadwal_ibadah', payloadData, rowId)
     showToast(`Data jadwal berhasil di${isEdit.value ? 'perbarui' : 'tambah'}.`)
+    localStorage.removeItem('gkjw_jadwal_form')
     closeModal()
   } catch (err) {
     showToast(err.message, 'error')

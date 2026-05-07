@@ -179,7 +179,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useChurchStore } from '@/stores/churchStore'
 import DoaCard from '@/components/DoaCard.vue'
 
@@ -195,6 +195,32 @@ const form = ref({
   pesan: '',
   izin_publik: false,
 })
+
+// Memuat data form dari local storage saat halaman pertama kali dirender
+onMounted(() => {
+  const savedForm = localStorage.getItem('gkjw_doa_form')
+  if (savedForm) {
+    try {
+      const parsed = JSON.parse(savedForm)
+      form.value = { ...form.value, ...parsed }
+    } catch (e) {
+      console.error('Error parsing saved form', e)
+    }
+  }
+})
+
+// Menyimpan otomatis ke local storage setiap kali ada perubahan pada form
+let debounceTimer = null
+watch(
+  form,
+  (newVal) => {
+    if (debounceTimer) clearTimeout(debounceTimer)
+    debounceTimer = setTimeout(() => {
+      localStorage.setItem('gkjw_doa_form', JSON.stringify(newVal))
+    }, 500)
+  },
+  { deep: true },
+)
 
 const publicRequests = computed(() => {
   return store.doa
@@ -239,6 +265,7 @@ const submitRequest = async () => {
       pesan: '',
       izin_publik: false,
     }
+    localStorage.removeItem('gkjw_doa_form')
   } catch (err) {
     errorMsg.value = err.message
   } finally {

@@ -487,11 +487,59 @@
         </div>
       </transition>
     </Teleport>
+
+    <!-- Floating Prayer Widget (Dynamic Island Style - Mobile Only) -->
+    <Teleport to="body">
+      <div class="fixed bottom-5 right-5 z-[90] md:hidden pointer-events-auto">
+        <div
+          class="bg-[#800000] text-white rounded-full shadow-2xl flex items-center overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] border-2 border-[#eab308]"
+          :class="showPrayerPopup ? 'w-[190px] h-12' : 'w-12 h-12'"
+        >
+          <!-- Icon Doa Icons8 -->
+          <router-link
+            to="/doa"
+            class="w-[44px] h-[44px] shrink-0 flex items-center justify-center hover:bg-[#500000] transition-colors rounded-full"
+          >
+            <img
+              src="https://img.icons8.com/fluent-systems-regular/96/ffffff/pray.png"
+              alt="pray"
+              class="w-[26px] h-[26px] object-contain"
+              :class="showPrayerPopup ? 'animate-bounce' : 'animate-pulse'"
+            />
+          </router-link>
+
+          <!-- Teks Notifikasi -->
+          <router-link
+            to="/doa"
+            class="flex-1 whitespace-nowrap text-[13px] font-bold tracking-wide transition-opacity duration-300 flex items-center text-[#fef08a]"
+            :class="showPrayerPopup ? 'opacity-100 delay-200' : 'opacity-0'"
+          >
+            Butuh didoakan?
+          </router-link>
+
+          <!-- Tombol Close -->
+          <button
+            v-show="showPrayerPopup"
+            @click.prevent="closePrayerPopup"
+            class="w-[36px] h-[44px] mr-2 shrink-0 flex items-center justify-center text-white/70 hover:text-white transition-colors"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </Teleport>
   </main>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useChurchStore } from '@/stores/churchStore'
 import WartaList from '@/components/WartaList.vue'
 import JadwalList from '@/components/JadwalList.vue'
@@ -514,6 +562,31 @@ const searchQuery = ref('')
 const isModalOpen = ref(false)
 const selectedItem = ref(null)
 const showAllRenungan = ref(false)
+const showPrayerPopup = ref(false)
+let autoCloseTimer = null
+
+const closePrayerPopup = () => {
+  showPrayerPopup.value = false
+  if (autoCloseTimer) clearTimeout(autoCloseTimer)
+}
+
+// Memberikan delay 3 detik setelah semua data ter-load agar notifikasi melebar
+// dan otomatis mengecil (hilang) jika tidak diklik setelah 5 detik.
+watch(
+  () => store.isLoading,
+  (loading) => {
+    if (!loading) {
+      setTimeout(() => {
+        showPrayerPopup.value = true
+
+        autoCloseTimer = setTimeout(() => {
+          showPrayerPopup.value = false
+        }, 5000)
+      }, 3000)
+    }
+  },
+  { immediate: true },
+)
 
 onMounted(() => {
   document.title = 'GKJW Sukolilo | Beranda Jemaat'
@@ -541,11 +614,9 @@ const filteredWarta = computed(() => {
   return sortedWarta.value.filter((w) => (w.judul || w.title || '').toLowerCase().includes(query))
 })
 
-// List Warta (Reguler) di bawah: Mengecualikan yang sudah masuk ke Headline
+// List Warta (Reguler) di bawah: Menampilkan semua warta termasuk headline
 const listWarta = computed(() => {
-  if (searchQuery.value) return filteredWarta.value
-  const headlineIds = combinedHeadlines.value.filter((h) => h.type === 'warta').map((h) => h.raw.id)
-  return sortedWarta.value.filter((w) => !headlineIds.includes(w.id))
+  return filteredWarta.value
 })
 
 // --- Modal Logic ---
@@ -576,12 +647,9 @@ const validJadwal = computed(() => {
     .sort((a, b) => new Date(a.tanggal || a.date) - new Date(b.tanggal || b.date))
 })
 
-// List Jadwal (Reguler) di bawah: Mengecualikan yang sudah masuk ke Headline
+// List Jadwal (Reguler) di bawah: Menampilkan semua jadwal termasuk headline
 const listJadwal = computed(() => {
-  const headlineIds = combinedHeadlines.value
-    .filter((h) => h.type === 'jadwal')
-    .map((h) => h.raw.id)
-  return validJadwal.value.filter((j) => !headlineIds.includes(j.id))
+  return validJadwal.value
 })
 
 // Format Waktu untuk Jadwal Headline

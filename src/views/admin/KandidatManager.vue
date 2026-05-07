@@ -242,7 +242,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
 import { useChurchStore } from '@/stores/churchStore'
 
@@ -262,7 +262,40 @@ const showToast = (msg, type = 'success') => {
 
 onMounted(() => {
   store.fetchKandidat()
+
+  const saved = localStorage.getItem('gkjw_kandidat_form')
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved)
+      if (parsed.showModal) {
+        form.value = parsed.form
+        isEdit.value = parsed.isEdit
+        showModal.value = parsed.showModal
+      }
+    } catch (e) {
+      console.error('Error parsing saved form', e)
+    }
+  }
 })
+
+let debounceTimer = null
+watch(
+  [form, showModal, isEdit],
+  ([newForm, newShowModal, newIsEdit]) => {
+    if (debounceTimer) clearTimeout(debounceTimer)
+    debounceTimer = setTimeout(() => {
+      localStorage.setItem(
+        'gkjw_kandidat_form',
+        JSON.stringify({
+          form: newForm,
+          showModal: newShowModal,
+          isEdit: newIsEdit,
+        }),
+      )
+    }, 500)
+  },
+  { deep: true },
+)
 
 const openModal = (item = null) => {
   if (item) {
@@ -309,6 +342,7 @@ const handleSave = async () => {
     await store.submitGasAction(isEdit.value ? 'update' : 'insert', 'tb_kandidat', payload, rowId)
     await store.fetchKandidat()
     showToast(`Berhasil disave.`)
+    localStorage.removeItem('gkjw_kandidat_form')
     closeModal()
   } catch (err) {
     showToast(err.message, 'error')

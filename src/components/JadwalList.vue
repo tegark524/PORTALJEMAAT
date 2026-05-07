@@ -35,7 +35,7 @@
           :key="index"
           @click="$emit('read-more', item)"
           class="relative bg-[#ffffff] border border-[#e7e5e4] rounded-[16px] overflow-hidden shadow-sm hover:shadow-md transition-all flex-col group min-h-[220px] cursor-pointer"
-          :class="index >= 1 && !showAll ? 'hidden md:flex' : 'flex'"
+          :class="showAll ? 'flex' : index === 0 ? 'flex' : index < 3 ? 'hidden md:flex' : 'hidden'"
         >
           <!-- Background Image Handling -->
           <div v-if="item.gambar" class="absolute inset-0 w-full h-full z-0 overflow-hidden">
@@ -52,9 +52,18 @@
 
           <!-- Card Content -->
           <div class="p-6 flex flex-col flex-1 relative z-10">
-            <h3 class="font-serif text-[22px] font-bold text-[#0c0a09] leading-tight mb-3">
-              {{ item.nama_ibadah || item.kategori }}
-            </h3>
+            <div class="flex items-start justify-between gap-2 mb-3">
+              <h3 class="font-serif text-[22px] font-bold text-[#0c0a09] leading-tight">
+                {{ cleanNamaIbadah(item.nama_ibadah || item.kategori) }}
+              </h3>
+              <span
+                v-if="getJadwalBadge(item.tanggal || item.date)"
+                :class="getJadwalBadge(item.tanggal || item.date).color"
+                class="px-2 py-1 rounded text-[10px] font-bold tracking-wider uppercase whitespace-nowrap shadow-sm shrink-0"
+              >
+                {{ getJadwalBadge(item.tanggal || item.date).text }}
+              </span>
+            </div>
 
             <div class="space-y-2 mb-4 text-[14px] text-[#292524] font-semibold flex-1">
               <div class="flex items-center gap-2">
@@ -141,8 +150,12 @@
         </div>
       </div>
 
-      <!-- Tombol Selengkapnya (Hanya Mobile) -->
-      <div v-if="jadwals.length > 1" class="mt-8 flex justify-center md:hidden">
+      <!-- Tombol Selengkapnya -->
+      <div
+        v-if="jadwals.length > 1"
+        class="mt-8 flex justify-center"
+        :class="jadwals.length <= 3 ? 'md:hidden' : ''"
+      >
         <button
           @click="showAll = !showAll"
           class="bg-transparent border border-[#d6d3d1] text-[#0c0a09] px-6 py-2.5 rounded-full text-[13px] font-bold hover:bg-[#f0efed] transition-colors"
@@ -162,6 +175,33 @@ defineProps({ jadwals: Array, isLoading: Boolean })
 defineEmits(['read-more'])
 
 const showAll = ref(false)
+
+const cleanNamaIbadah = (name) => {
+  if (!name) return ''
+  // Membersihkan prefix teks [HARI INI] / [BESOK] jika sebelumnya terbawa dari filter HomeView
+  return name.replace(/^\[HARI INI\]\s*-?\s*/i, '').replace(/^\[BESOK\]\s*-?\s*/i, '')
+}
+
+const getJadwalBadge = (dateStr) => {
+  if (!dateStr) return null
+  const d = new Date(dateStr)
+  if (isNaN(d.getTime())) return null
+  d.setHours(0, 0, 0, 0)
+
+  const now = new Date()
+  now.setHours(0, 0, 0, 0)
+
+  const tomorrow = new Date(now)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+
+  if (d.getTime() === now.getTime()) {
+    return { text: 'HARI INI', color: 'bg-[#dc2626] text-[#ffffff]' }
+  }
+  if (d.getTime() === tomorrow.getTime()) {
+    return { text: 'BESOK', color: 'bg-[#f59e0b] text-[#ffffff]' }
+  }
+  return null
+}
 
 const formatWaktu = (timeStr) => {
   if (!timeStr) return ''
