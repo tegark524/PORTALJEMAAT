@@ -2,24 +2,37 @@
   <div>
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
       <h2 class="font-serif text-[32px] font-light text-[#0c0a09]">Kelola Renungan</h2>
-      <button
-        @click="openModal()"
-        class="bg-[#800000] text-[#ffffff] px-5 py-2 rounded-full text-[15px] font-medium hover:bg-[#500000] shadow-md transition-all shrink-0"
-      >
-        + Tambah Renungan
-      </button>
+      <div class="flex w-full sm:w-auto justify-end">
+        <button
+          @click="openModal()"
+          class="bg-[#800000] text-[#ffffff] px-4 py-1.5 sm:px-5 sm:py-2 rounded-full text-[13px] sm:text-[15px] font-medium hover:bg-[#500000] shadow-md transition-all shrink-0 whitespace-nowrap"
+        >
+          <span class="sm:hidden">+ Tambah</span>
+          <span class="hidden sm:inline">+ Tambah Renungan</span>
+        </button>
+      </div>
     </div>
 
     <div class="bg-white border border-[#e7e5e4] rounded-[16px] shadow-sm overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-[#f0efed] text-[#777169] text-[12px] uppercase tracking-wider font-bold">
-              <th class="p-4 border-b border-[#e7e5e4] w-32 whitespace-nowrap">Tanggal</th>
-              <th class="p-4 border-b border-[#e7e5e4] min-w-[200px]">Judul</th>
-              <th class="p-4 border-b border-[#e7e5e4] w-48">Nats</th>
-              <th class="p-4 border-b border-[#e7e5e4] w-40">Penulis</th>
-              <th class="p-4 border-b border-[#e7e5e4] w-24 text-center whitespace-nowrap">Aksi</th>
+            <tr
+              class="bg-[#f0efed] text-[#777169] text-[10px] sm:text-[12px] uppercase tracking-wider font-bold"
+            >
+              <th class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] w-24 sm:w-32 whitespace-nowrap">
+                Tanggal
+              </th>
+              <th class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] min-w-[120px] sm:min-w-[200px]">
+                Judul
+              </th>
+              <th class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] w-32 sm:w-48">Nats</th>
+              <th class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] w-24 sm:w-40">Penulis</th>
+              <th
+                class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] w-20 sm:w-24 text-center whitespace-nowrap"
+              >
+                Aksi
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -29,31 +42,40 @@
               class="hover:bg-[#fafafa] transition-colors group"
             >
               <td
-                class="p-4 border-b border-[#e7e5e4] text-[13px] text-[#4e4e4e] align-middle whitespace-nowrap"
+                class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] text-xs sm:text-[13px] text-[#4e4e4e] align-middle whitespace-nowrap"
               >
                 {{ formatDisplayDate(item.tanggal_tayang || item.date || item.tanggal) }}
               </td>
               <td
-                class="p-4 border-b border-[#e7e5e4] align-middle text-[14px] font-bold text-[#0c0a09]"
+                class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] align-middle text-xs sm:text-[14px] font-bold text-[#0c0a09]"
               >
                 {{ item.judul || item.tema || item.title }}
               </td>
               <td
-                class="p-4 border-b border-[#e7e5e4] align-middle text-[13px] text-[#4e4e4e] italic"
+                class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] align-middle text-xs sm:text-[13px] text-[#4e4e4e] italic"
               >
                 {{ item.nats }}
               </td>
-              <td class="p-4 border-b border-[#e7e5e4] align-middle text-[13px] text-[#4e4e4e]">
+              <td
+                class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] align-middle text-xs sm:text-[13px] text-[#4e4e4e]"
+              >
                 {{ item.penulis || '-' }}
               </td>
-              <td class="p-4 border-b border-[#e7e5e4] align-middle whitespace-nowrap">
-                <div class="flex justify-center gap-2">
+              <td
+                class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] align-middle whitespace-nowrap text-center"
+              >
+                <div class="flex justify-center gap-1.5 sm:gap-2">
                   <button
                     @click="openModal(item)"
-                    class="p-2 bg-[#f0efed] text-[#4e4e4e] hover:bg-[#e7e5e4] hover:text-[#800000] rounded-md transition-colors"
+                    class="p-1.5 sm:p-2 bg-[#f0efed] text-[#4e4e4e] hover:bg-[#e7e5e4] hover:text-[#800000] rounded-md transition-colors"
                     title="Edit Data"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      class="w-3.5 h-3.5 sm:w-4 sm:h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -64,13 +86,13 @@
                   </button>
                   <button
                     @click="handleDelete(item.id)"
-                    class="p-2 bg-[#fee2e2] text-[#dc2626] hover:bg-[#fecaca] hover:text-[#991b1b] rounded-md transition-colors"
+                    class="p-1.5 sm:p-2 bg-[#fee2e2] text-[#dc2626] hover:bg-[#fecaca] hover:text-[#991b1b] rounded-md transition-colors"
                     title="Hapus Data"
                     :disabled="isDeleting === item.id"
                   >
                     <div
                       v-if="isDeleting === item.id"
-                      class="flex flex-row gap-0.5 justify-center items-center w-4 h-4"
+                      class="flex flex-row gap-0.5 justify-center items-center w-3.5 h-3.5 sm:w-4 sm:h-4"
                     >
                       <div class="w-1 h-1 rounded-full bg-current animate-bounce"></div>
                       <div
@@ -82,7 +104,7 @@
                     </div>
                     <svg
                       v-else
-                      class="w-4 h-4"
+                      class="w-3.5 h-3.5 sm:w-4 sm:h-4"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -99,7 +121,7 @@
               </td>
             </tr>
             <tr v-if="!store.renungan.length">
-              <td colspan="5" class="p-8 text-center text-[#777169]">
+              <td colspan="5" class="p-4 sm:p-8 text-center text-[#777169]">
                 <div v-if="store.isLoading" class="flex flex-col items-center justify-center gap-3">
                   <div class="flex flex-row gap-2">
                     <div class="w-3 h-3 rounded-full bg-[#800000] animate-bounce"></div>

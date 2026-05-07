@@ -3,18 +3,19 @@
     <!-- Header & Search -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
       <h2 class="font-serif text-[32px] font-light text-[#0c0a09]">Kelola Warta</h2>
-      <div class="flex gap-3 w-full md:w-auto">
+      <div class="flex gap-2 sm:gap-3 w-full md:w-auto">
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="Cari judul warta..."
-          class="flex-1 md:w-64 border border-[#d6d3d1] rounded-full px-4 py-2 text-[14px] focus:outline-none focus:border-[#800000] focus:ring-1 focus:ring-[#800000]"
+          placeholder="Cari warta..."
+          class="flex-1 md:w-64 border border-[#d6d3d1] rounded-full px-3 py-1.5 sm:px-4 sm:py-2 text-[13px] sm:text-[14px] focus:outline-none focus:border-[#800000] focus:ring-1 focus:ring-[#800000]"
         />
         <button
           @click="openModal()"
-          class="bg-[#800000] text-[#ffffff] px-5 py-2 rounded-full text-[15px] font-medium hover:bg-[#500000] shadow-md transition-all shrink-0"
+          class="bg-[#800000] text-[#ffffff] px-4 py-1.5 sm:px-5 sm:py-2 rounded-full text-[13px] sm:text-[15px] font-medium hover:bg-[#500000] shadow-md transition-all shrink-0 whitespace-nowrap"
         >
-          + Tambah Warta
+          <span class="sm:hidden">+ Tambah</span>
+          <span class="hidden sm:inline">+ Tambah Warta</span>
         </button>
       </div>
     </div>
@@ -24,11 +25,29 @@
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-[#f0efed] text-[#777169] text-[12px] uppercase tracking-wider font-bold">
-              <th class="p-4 border-b border-[#e7e5e4] w-32 whitespace-nowrap">Tanggal</th>
-              <th class="p-4 border-b border-[#e7e5e4] min-w-[200px]">Judul</th>
-              <th class="p-4 border-b border-[#e7e5e4] w-40">Kategori</th>
-              <th class="p-4 border-b border-[#e7e5e4] w-24 text-center whitespace-nowrap">Aksi</th>
+            <tr
+              class="bg-[#f0efed] text-[#777169] text-[10px] sm:text-sm uppercase tracking-wider font-bold border-b border-[#d6d3d1]"
+            >
+              <th
+                class="px-2 py-3 sm:px-6 sm:py-4 border-b border-[#e7e5e4] w-24 sm:w-32 whitespace-nowrap text-left"
+              >
+                Tanggal
+              </th>
+              <th
+                class="px-2 py-3 sm:px-6 sm:py-4 border-b border-[#e7e5e4] min-w-[120px] sm:min-w-[200px] text-left"
+              >
+                Judul
+              </th>
+              <th
+                class="px-2 py-3 sm:px-6 sm:py-4 border-b border-[#e7e5e4] w-28 sm:w-40 text-left"
+              >
+                Kategori
+              </th>
+              <th
+                class="px-2 py-3 sm:px-6 sm:py-4 border-b border-[#e7e5e4] w-20 sm:w-24 text-center whitespace-nowrap"
+              >
+                Aksi
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -38,13 +57,15 @@
               class="hover:bg-[#fafafa] transition-colors group"
             >
               <td
-                class="p-4 border-b border-[#e7e5e4] text-[13px] text-[#4e4e4e] align-middle whitespace-nowrap"
+                class="px-2 py-3 sm:px-6 sm:py-4 border-b border-[#e7e5e4] text-xs sm:text-[13px] text-[#4e4e4e] align-middle whitespace-nowrap text-left"
               >
                 {{ formatDisplayDate(item.tanggal || item.date) }}
               </td>
-              <td class="p-4 border-b border-[#e7e5e4] align-middle">
+              <td
+                class="px-2 py-3 sm:px-6 sm:py-4 border-b border-[#e7e5e4] align-middle text-left"
+              >
                 <div class="flex items-center gap-2">
-                  <span class="text-[14px] font-bold text-[#0c0a09]">{{
+                  <span class="text-xs sm:text-[14px] font-bold text-[#0c0a09]">{{
                     item.judul || item.title
                   }}</span>
                   <span
@@ -60,16 +81,20 @@
                   </span>
                 </div>
               </td>
-              <td class="p-4 border-b border-[#e7e5e4] align-middle">
+              <td
+                class="px-2 py-3 sm:px-6 sm:py-4 border-b border-[#e7e5e4] align-middle text-left"
+              >
                 <span
                   v-if="item.kategori || item.category"
-                  class="bg-[#f0efed] text-[#4e4e4e] px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide border border-[#d6d3d1] inline-block whitespace-nowrap"
+                  class="bg-[#f0efed] text-[#4e4e4e] px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-wide border border-[#d6d3d1] inline-block whitespace-nowrap"
                 >
                   {{ item.kategori || item.category }}
                 </span>
                 <span v-else class="text-[13px] text-[#a8a29e] italic">-</span>
               </td>
-              <td class="p-4 border-b border-[#e7e5e4] align-middle whitespace-nowrap">
+              <td
+                class="px-2 py-3 sm:px-6 sm:py-4 border-b border-[#e7e5e4] align-middle whitespace-nowrap text-center"
+              >
                 <div class="flex justify-center gap-2">
                   <button
                     @click="openModal(item)"
@@ -122,7 +147,7 @@
               </td>
             </tr>
             <tr v-if="!filteredWarta.length">
-              <td colspan="4" class="p-8 text-center text-[#777169]">
+              <td colspan="4" class="p-4 sm:p-8 text-center text-[#777169]">
                 <div v-if="store.isLoading" class="flex flex-col items-center justify-center gap-3">
                   <div class="flex flex-row gap-2">
                     <div class="w-3 h-3 rounded-full bg-[#800000] animate-bounce"></div>

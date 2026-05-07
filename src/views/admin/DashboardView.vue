@@ -275,46 +275,64 @@
               Pantau ringkasan data jemaat dan informasi pelayanan di sini.
             </p>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             <div
-              class="bg-[#ffffff] rounded-[16px] p-6 border border-[#e7e5e4] shadow-[0_4px_16px_rgba(0,0,0,0.04)] flex flex-col justify-between"
+              class="bg-[#ffffff] rounded-[16px] p-4 sm:p-6 border border-[#e7e5e4] shadow-sm flex flex-col justify-between"
             >
-              <h3 class="text-[12px] font-semibold text-[#777169] mb-2 uppercase tracking-[0.96px]">
+              <h3
+                class="text-[10px] sm:text-[12px] font-semibold text-[#777169] mb-1 sm:mb-2 uppercase tracking-wider line-clamp-1"
+                title="Pengajuan Doa"
+              >
                 Pengajuan Doa
               </h3>
-              <p class="font-serif text-[36px] font-light tracking-[-0.36px] text-[#0c0a09]">
+              <p
+                class="font-serif text-[28px] sm:text-[36px] font-light tracking-tight text-[#0c0a09]"
+              >
                 {{ store.doa.length }}
               </p>
             </div>
             <div
-              class="bg-[#ffffff] rounded-[16px] p-6 border border-[#e7e5e4] shadow-[0_4px_16px_rgba(0,0,0,0.04)] flex flex-col justify-between"
+              class="bg-[#ffffff] rounded-[16px] p-4 sm:p-6 border border-[#e7e5e4] shadow-sm flex flex-col justify-between"
             >
-              <h3 class="text-[12px] font-semibold text-[#777169] mb-2 uppercase tracking-[0.96px]">
+              <h3
+                class="text-[10px] sm:text-[12px] font-semibold text-[#777169] mb-1 sm:mb-2 uppercase tracking-wider line-clamp-1"
+                title="Ibadah Terjadwal"
+              >
                 Ibadah Terjadwal
               </h3>
-              <p class="font-serif text-[36px] font-light tracking-[-0.36px] text-[#0c0a09]">
+              <p
+                class="font-serif text-[28px] sm:text-[36px] font-light tracking-tight text-[#0c0a09]"
+              >
                 {{ store.jadwal.length }}
               </p>
             </div>
             <div
-              class="bg-[#ffffff] rounded-[16px] p-6 border border-[#e7e5e4] shadow-[0_4px_16px_rgba(0,0,0,0.04)] flex flex-col justify-between"
+              class="bg-[#ffffff] rounded-[16px] p-4 sm:p-6 border border-[#e7e5e4] shadow-sm flex flex-col justify-between"
             >
-              <h3 class="text-[12px] font-semibold text-[#777169] mb-2 uppercase tracking-[0.96px]">
+              <h3
+                class="text-[10px] sm:text-[12px] font-semibold text-[#777169] mb-1 sm:mb-2 uppercase tracking-wider line-clamp-1"
+                title="Warta On Air"
+              >
                 Warta On Air
               </h3>
-              <p class="font-serif text-[36px] font-light tracking-[-0.36px] text-[#0c0a09]">
+              <p
+                class="font-serif text-[28px] sm:text-[36px] font-light tracking-tight text-[#0c0a09]"
+              >
                 {{ store.warta.length }}
               </p>
             </div>
             <div
-              class="bg-[#ffffff] rounded-[16px] p-6 border border-[#e7e5e4] shadow-[0_4px_16px_rgba(0,0,0,0.04)] flex flex-col justify-between"
+              class="bg-[#ffffff] rounded-[16px] p-4 sm:p-6 border border-[#e7e5e4] shadow-sm flex flex-col justify-between"
             >
-              <h3 class="text-[12px] font-semibold text-[#777169] mb-2 uppercase tracking-[0.96px]">
+              <h3
+                class="text-[10px] sm:text-[12px] font-semibold text-[#777169] mb-1 sm:mb-2 uppercase tracking-wider line-clamp-1"
+                title="Status Renungan"
+              >
                 Status Renungan
               </h3>
-              <div class="flex items-center gap-3 mt-2">
+              <div class="flex items-center gap-2 sm:gap-3 mt-1 sm:mt-2">
                 <span
-                  class="w-2.5 h-2.5 rounded-full shrink-0"
+                  class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shrink-0"
                   :class="{
                     'bg-[#dc2626]': renunganStatus.status === 'danger',
                     'bg-[#f59e0b]': renunganStatus.status === 'warning',
@@ -322,7 +340,7 @@
                   }"
                 ></span>
                 <p
-                  class="text-[14px] font-medium leading-tight"
+                  class="text-[11px] sm:text-[13px] font-medium leading-tight"
                   :class="{
                     'text-[#dc2626]': renunganStatus.status === 'danger',
                     'text-[#0c0a09]': renunganStatus.status !== 'danger',
@@ -336,43 +354,48 @@
 
           <!-- Monitoring Renungan Chart (7 Hari) -->
           <div
-            class="bg-[#ffffff] rounded-[16px] p-6 md:p-8 border border-[#e7e5e4] shadow-[0_4px_16px_rgba(0,0,0,0.04)] mt-6"
+            class="bg-[#ffffff] rounded-[16px] p-5 sm:p-6 md:p-8 border border-[#e7e5e4] shadow-sm mt-6"
           >
             <div
-              class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4"
+              class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 sm:mb-6 gap-4"
             >
               <div>
-                <h3 class="font-serif text-[22px] md:text-[24px] font-bold text-[#0c0a09]">
+                <h3
+                  class="font-serif text-[20px] sm:text-[22px] md:text-[24px] font-bold text-[#0c0a09]"
+                >
                   Monitoring Renungan
                 </h3>
-                <p class="text-[#777169] text-[13px] md:text-[14px] mt-1">
+                <p class="text-[#777169] text-[12px] sm:text-[13px] md:text-[14px] mt-1">
                   Pantau ketersediaan renungan 3 hari ke belakang hingga 3 hari ke depan.
                 </p>
               </div>
               <div
-                class="flex items-center gap-4 text-[12px] md:text-[13px] font-medium text-[#4e4e4e] bg-[#f5f5f5] px-4 py-2 rounded-full border border-[#e7e5e4]"
+                class="flex flex-wrap items-center gap-3 sm:gap-4 text-[11px] sm:text-[12px] md:text-[13px] font-medium text-[#4e4e4e] bg-[#f5f5f5] px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-[#e7e5e4]"
               >
-                <div class="flex items-center gap-2">
-                  <span class="w-3 h-3 rounded-full bg-[#16a34a] shadow-sm"></span> Tersedia
-                </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1.5 sm:gap-2">
                   <span
-                    class="w-3 h-3 rounded-full bg-[#fee2e2] shadow-sm border border-[#fca5a5]"
+                    class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#16a34a] shadow-sm"
+                  ></span>
+                  Tersedia
+                </div>
+                <div class="flex items-center gap-1.5 sm:gap-2">
+                  <span
+                    class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#fee2e2] shadow-sm border border-[#fca5a5]"
                   ></span>
                   Kosong
                 </div>
               </div>
             </div>
 
-            <div class="relative mt-8 pt-4">
+            <div class="relative mt-6 sm:mt-8 pt-4">
               <!-- Highlight Hari Ini Background -->
               <div
-                class="absolute left-[50%] -translate-x-1/2 top-0 h-full w-[14%] bg-[#faf7f2] rounded-xl -z-10 border border-[#e7e5e4]/50"
+                class="absolute left-[50%] -translate-x-1/2 top-0 h-full w-[16%] sm:w-[15%] md:w-[14%] bg-[#faf7f2] rounded-xl -z-10 border border-[#e7e5e4]/50"
               ></div>
 
               <!-- Bars -->
               <div
-                class="flex items-end justify-between h-40 gap-2 md:gap-4 relative z-10 px-2 md:px-4 border-b border-[#e7e5e4] pb-4"
+                class="flex items-end justify-between h-32 sm:h-40 gap-1 sm:gap-2 md:gap-4 relative z-10 px-0 sm:px-2 md:px-4 border-b border-[#e7e5e4] pb-4"
               >
                 <div
                   v-for="day in weeklyRenunganChart"
@@ -380,17 +403,20 @@
                   class="flex flex-col items-center flex-1 h-full justify-end group cursor-pointer"
                 >
                   <span
-                    class="text-[10px] md:text-[12px] font-bold mb-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
+                    class="text-[8px] sm:text-[10px] md:text-[12px] font-bold mb-1 sm:mb-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
                     :class="day.hasRenungan ? 'text-[#16a34a]' : 'text-[#dc2626]'"
                   >
-                    {{ day.hasRenungan ? 'Tersedia' : 'Kosong' }}
+                    <span class="sm:hidden">{{ day.hasRenungan ? 'Ada' : 'Kosong' }}</span>
+                    <span class="hidden sm:inline">{{
+                      day.hasRenungan ? 'Tersedia' : 'Kosong'
+                    }}</span>
                   </span>
                   <div
-                    class="w-full max-w-[32px] md:max-w-[48px] rounded-t-xl transition-all duration-1000 ease-out flex-shrink-0"
+                    class="w-full max-w-[20px] sm:max-w-[32px] md:max-w-[48px] rounded-t-lg sm:rounded-t-xl transition-all duration-1000 ease-out flex-shrink-0"
                     :class="
                       day.hasRenungan
-                        ? 'h-[120px] bg-[#16a34a] shadow-[0_4px_12px_rgba(22,163,74,0.25)]'
-                        : 'h-[24px] bg-[#fee2e2] border border-[#fca5a5]'
+                        ? 'h-[90px] sm:h-[120px] bg-[#16a34a] shadow-[0_4px_12px_rgba(22,163,74,0.25)]'
+                        : 'h-[16px] sm:h-[24px] bg-[#fee2e2] border border-[#fca5a5]'
                     "
                   ></div>
                 </div>
@@ -398,7 +424,7 @@
 
               <!-- Labels -->
               <div
-                class="flex items-center justify-between gap-2 md:gap-4 mt-4 px-2 md:px-4 relative z-10"
+                class="flex items-center justify-between gap-1 sm:gap-2 md:gap-4 mt-3 sm:mt-4 px-0 sm:px-2 md:px-4 relative z-10"
               >
                 <div
                   v-for="day in weeklyRenunganChart"
@@ -406,16 +432,16 @@
                   class="flex flex-col items-center flex-1"
                 >
                   <span
-                    class="text-[11px] md:text-[14px] whitespace-nowrap text-center transition-colors"
+                    class="text-[9px] sm:text-[11px] md:text-[14px] whitespace-nowrap text-center transition-colors"
                     :class="
                       day.isToday
-                        ? 'font-bold text-[#800000] bg-[#800000]/10 px-2.5 py-1 rounded-md'
+                        ? 'font-bold text-[#800000] bg-[#800000]/10 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md'
                         : 'font-medium text-[#4e4e4e]'
                     "
                   >
                     {{ day.label }}
                   </span>
-                  <span class="text-[9px] md:text-[11px] text-[#a8a29e] mt-1">{{
+                  <span class="text-[8px] sm:text-[9px] md:text-[11px] text-[#a8a29e] mt-1">{{
                     day.dateLabel
                   }}</span>
                 </div>

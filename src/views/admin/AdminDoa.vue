@@ -2,18 +2,19 @@
   <div>
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
       <h2 class="font-serif text-[32px] font-light text-[#0c0a09]">Moderasi Doa</h2>
-      <div class="flex gap-3 w-full md:w-auto">
+      <div class="flex gap-2 sm:gap-3 w-full md:w-auto">
         <input
           v-model="searchQuery"
           type="text"
           placeholder="Cari pengirim atau pesan..."
-          class="flex-1 md:w-64 border border-[#d6d3d1] rounded-full px-4 py-2 text-[14px] focus:outline-none focus:border-[#292524]"
+          class="flex-1 md:w-64 border border-[#d6d3d1] rounded-full px-3 py-1.5 sm:px-4 sm:py-2 text-[13px] sm:text-[14px] focus:outline-none focus:border-[#800000] focus:ring-1 focus:ring-[#800000]"
         />
         <button
           @click="openModal()"
-          class="bg-[#800000] text-[#ffffff] px-5 py-2 rounded-full text-[15px] font-medium hover:bg-[#500000] shadow-md transition-all shrink-0"
+          class="bg-[#800000] text-[#ffffff] px-4 py-1.5 sm:px-5 sm:py-2 rounded-full text-[13px] sm:text-[15px] font-medium hover:bg-[#500000] shadow-md transition-all shrink-0 whitespace-nowrap"
         >
-          + Tambah Doa
+          <span class="sm:hidden">+ Tambah</span>
+          <span class="hidden sm:inline">+ Tambah Doa</span>
         </button>
       </div>
     </div>
@@ -22,13 +23,25 @@
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-[#f0efed] text-[#777169] text-[12px] uppercase tracking-wider font-bold">
-              <th class="p-4 border-b border-[#e7e5e4] w-28 whitespace-nowrap">Waktu</th>
-              <th class="p-4 border-b border-[#e7e5e4] w-48">Pengirim</th>
-              <th class="p-4 border-b border-[#e7e5e4] w-40">Layanan</th>
-              <th class="p-4 border-b border-[#e7e5e4] min-w-[200px]">Pesan</th>
-              <th class="p-4 border-b border-[#e7e5e4] w-32 text-center">Tindak Lanjut</th>
-              <th class="p-4 border-b border-[#e7e5e4] w-24 text-center whitespace-nowrap">Aksi</th>
+            <tr
+              class="bg-[#f0efed] text-[#777169] text-[10px] sm:text-[12px] uppercase tracking-wider font-bold"
+            >
+              <th class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] w-20 sm:w-28 whitespace-nowrap">
+                Waktu
+              </th>
+              <th class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] w-32 sm:w-48">Pengirim</th>
+              <th class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] w-28 sm:w-40">Layanan</th>
+              <th class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] min-w-[120px] sm:min-w-[200px]">
+                Pesan
+              </th>
+              <th class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] w-24 sm:w-32 text-center">
+                Tindak Lanjut
+              </th>
+              <th
+                class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] w-20 sm:w-24 text-center whitespace-nowrap"
+              >
+                Aksi
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -38,13 +51,13 @@
               class="hover:bg-[#fafafa] transition-colors group"
             >
               <td
-                class="p-4 border-b border-[#e7e5e4] text-[13px] text-[#4e4e4e] align-middle whitespace-nowrap"
+                class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] text-xs sm:text-[13px] text-[#4e4e4e] align-middle whitespace-nowrap"
               >
                 {{ formatDisplayDate(item.timestamp || item.tanggal || item.date) }}
               </td>
-              <td class="p-4 border-b border-[#e7e5e4] align-middle">
+              <td class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] align-middle">
                 <div class="flex items-center gap-2">
-                  <span class="text-[14px] font-bold text-[#0c0a09]">{{
+                  <span class="text-xs sm:text-[14px] font-bold text-[#0c0a09]">{{
                     item.nama || item.name || 'Anonim'
                   }}</span>
                   <span
@@ -61,29 +74,29 @@
                 </div>
                 <div
                   v-if="item.no_wa && item.no_wa !== '-'"
-                  class="text-[12px] text-[#777169] mt-0.5 font-mono"
+                  class="text-[10px] sm:text-[12px] text-[#777169] mt-0.5 font-mono"
                 >
                   {{ item.no_wa }}
                 </div>
               </td>
-              <td class="p-4 border-b border-[#e7e5e4] align-middle">
+              <td class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] align-middle">
                 <span
-                  class="bg-[#f0efed] text-[#4e4e4e] px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide border border-[#d6d3d1] inline-block whitespace-nowrap"
+                  class="bg-[#f0efed] text-[#4e4e4e] px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-wide border border-[#d6d3d1] inline-block whitespace-nowrap"
                   >{{ item.jenis_layanan || 'Permohonan Doa' }}</span
                 >
               </td>
-              <td class="p-4 border-b border-[#e7e5e4] align-middle">
+              <td class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] align-middle">
                 <div
-                  class="text-[14px] text-[#4e4e4e] line-clamp-2 min-w-[200px]"
+                  class="text-xs sm:text-[14px] text-[#4e4e4e] line-clamp-2 sm:min-w-[200px]"
                   :title="item.pesan || item.isi_doa"
                 >
                   {{ item.pesan || item.isi_doa || item.content }}
                 </div>
               </td>
-              <td class="p-4 border-b border-[#e7e5e4] align-middle text-center">
+              <td class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] align-middle text-center">
                 <button
                   @click="toggleStatus(item)"
-                  class="px-4 py-1.5 rounded-full font-bold uppercase tracking-wide text-[10px] transition-colors w-20 text-center"
+                  class="px-2 sm:px-4 py-1.5 rounded-full font-bold uppercase tracking-wide text-[9px] sm:text-[10px] transition-colors w-16 sm:w-20 text-center"
                   :class="
                     item.status === 'Sudah Ditangani'
                       ? 'bg-[#dcfce7] text-[#166534] hover:bg-[#bbf7d0]'
@@ -106,14 +119,21 @@
                   <span v-else>{{ item.status === 'Sudah Ditangani' ? 'Selesai' : 'Belum' }}</span>
                 </button>
               </td>
-              <td class="p-4 border-b border-[#e7e5e4] align-middle whitespace-nowrap">
-                <div class="flex justify-center gap-2">
+              <td
+                class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] align-middle whitespace-nowrap text-center"
+              >
+                <div class="flex justify-center gap-1.5 sm:gap-2">
                   <button
                     @click="openModal(item)"
-                    class="p-2 bg-[#f0efed] text-[#4e4e4e] hover:bg-[#e7e5e4] hover:text-[#800000] rounded-md transition-colors"
+                    class="p-1.5 sm:p-2 bg-[#f0efed] text-[#4e4e4e] hover:bg-[#e7e5e4] hover:text-[#800000] rounded-md transition-colors"
                     title="Edit Data"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      class="w-3.5 h-3.5 sm:w-4 sm:h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -124,13 +144,13 @@
                   </button>
                   <button
                     @click="deleteDoa(item.id)"
-                    class="p-2 bg-[#fee2e2] text-[#dc2626] hover:bg-[#fecaca] hover:text-[#991b1b] rounded-md transition-colors"
+                    class="p-1.5 sm:p-2 bg-[#fee2e2] text-[#dc2626] hover:bg-[#fecaca] hover:text-[#991b1b] rounded-md transition-colors"
                     title="Hapus Data"
                     :disabled="isDeleting === item.id"
                   >
                     <div
                       v-if="isDeleting === item.id"
-                      class="flex flex-row gap-0.5 justify-center items-center w-4 h-4"
+                      class="flex flex-row gap-0.5 justify-center items-center w-3.5 h-3.5 sm:w-4 sm:h-4"
                     >
                       <div class="w-1 h-1 rounded-full bg-current animate-bounce"></div>
                       <div
@@ -142,7 +162,7 @@
                     </div>
                     <svg
                       v-else
-                      class="w-4 h-4"
+                      class="w-3.5 h-3.5 sm:w-4 sm:h-4"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -159,7 +179,7 @@
               </td>
             </tr>
             <tr v-if="!filteredDoa.length">
-              <td colspan="6" class="p-8 text-center text-[#777169]">
+              <td colspan="6" class="p-4 sm:p-8 text-center text-[#777169]">
                 <div v-if="store.isLoading" class="flex flex-col items-center justify-center gap-3">
                   <div class="flex flex-row gap-2">
                     <div class="w-3 h-3 rounded-full bg-[#800000] animate-bounce"></div>

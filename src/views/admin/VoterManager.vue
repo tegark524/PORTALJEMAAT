@@ -2,26 +2,29 @@
   <div class="space-y-6">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <h1 class="text-2xl font-serif font-bold text-[#0c0a09]">Manajemen Pemilih</h1>
-      <div class="flex gap-3">
+      <div class="flex gap-2 sm:gap-3 w-full sm:w-auto">
         <!-- Tombol Hapus Massal -->
         <button
           v-if="selectedVoters.length > 0"
           @click="handleMassDelete"
           :disabled="isDeletingMass"
-          class="bg-[#dc2626] text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-[#991b1b] disabled:opacity-50 transition-colors flex items-center gap-2"
+          class="bg-[#dc2626] text-white px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-lg text-[13px] sm:text-sm font-bold hover:bg-[#991b1b] disabled:opacity-50 transition-colors flex flex-1 sm:flex-none justify-center items-center gap-1.5 sm:gap-2"
         >
           <div
             v-if="isDeletingMass"
             class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"
           ></div>
-          <span v-else>Hapus Terpilih ({{ selectedVoters.length }})</span>
+          <span v-else>
+            <span class="sm:hidden">Hapus ({{ selectedVoters.length }})</span>
+            <span class="hidden sm:inline">Hapus Terpilih ({{ selectedVoters.length }})</span>
+          </span>
         </button>
 
         <button
           @click="showImportModal = true"
-          class="bg-[#800000] text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-[#500000] transition-colors flex items-center gap-2"
+          class="bg-[#800000] text-white px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-lg text-[13px] sm:text-sm font-bold hover:bg-[#500000] transition-colors flex flex-1 sm:flex-none justify-center items-center gap-1.5 sm:gap-2 whitespace-nowrap"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -29,18 +32,19 @@
               d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
             ></path>
           </svg>
-          Import Data (Excel)
+          <span class="sm:hidden">Import</span>
+          <span class="hidden sm:inline">Import Data (Excel)</span>
         </button>
       </div>
     </div>
 
     <!-- Search & Filters -->
-    <div class="bg-white p-4 rounded-xl border border-[#e7e5e4] shadow-sm">
+    <div class="bg-white p-3 sm:p-4 rounded-xl border border-[#e7e5e4] shadow-sm">
       <input
         v-model="searchQuery"
         type="text"
         placeholder="Cari ID atau Nama Jemaat..."
-        class="w-full sm:max-w-md bg-[#fcfcfc] border border-[#e7e5e4] rounded-lg px-4 py-2.5 text-[15px] focus:outline-none focus:border-[#800000]"
+        class="w-full sm:max-w-md bg-[#fcfcfc] border border-[#e7e5e4] rounded-lg px-3 py-1.5 sm:px-4 sm:py-2.5 text-[13px] sm:text-[15px] focus:outline-none focus:border-[#800000]"
       />
     </div>
 
@@ -49,23 +53,32 @@
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-[#f5f5f5] text-[#777169] text-[12px] uppercase tracking-wider font-bold">
-              <th class="p-4 border-b border-[#e7e5e4] w-12 text-center">
+            <tr
+              class="bg-[#f5f5f5] text-[#777169] text-[10px] sm:text-[12px] uppercase tracking-wider font-bold"
+            >
+              <th class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] w-10 sm:w-12 text-center">
                 <input
                   type="checkbox"
                   v-model="selectAll"
-                  class="w-4 h-4 text-[#800000] border-[#d6d3d1] rounded focus:ring-[#800000] cursor-pointer"
+                  class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#800000] border-[#d6d3d1] rounded focus:ring-[#800000] cursor-pointer"
                 />
               </th>
-              <th class="p-4 border-b border-[#e7e5e4]">ID Jemaat (NIK/NIJ)</th>
-              <th class="p-4 border-b border-[#e7e5e4]">Nama Lengkap</th>
-              <th class="p-4 border-b border-[#e7e5e4] text-center">Status Pemilihan</th>
-              <th class="p-4 border-b border-[#e7e5e4] text-center w-24">Aksi</th>
+              <th class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] whitespace-nowrap">
+                ID Jemaat (NIK/NIJ)
+              </th>
+              <th class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] min-w-[120px]">Nama Lengkap</th>
+              <th class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] text-center w-24 sm:w-auto">
+                <span class="sm:hidden">Status</span>
+                <span class="hidden sm:inline">Status Pemilihan</span>
+              </th>
+              <th class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] text-center w-20 sm:w-24">
+                Aksi
+              </th>
             </tr>
           </thead>
-          <tbody class="text-[#4e4e4e] text-[14px]">
+          <tbody class="text-[#4e4e4e] text-xs sm:text-[14px]">
             <tr v-if="filteredVoters.length === 0">
-              <td colspan="5" class="p-8 text-center text-[#a8a29e]">
+              <td colspan="5" class="p-4 sm:p-8 text-center text-[#a8a29e]">
                 Tidak ada data pemilih ditemukan.
               </td>
             </tr>
@@ -74,19 +87,23 @@
               :key="voter.id || voter.ID"
               class="hover:bg-[#fafafa] border-b border-[#e7e5e4] last:border-0"
             >
-              <td class="p-4 text-center">
+              <td class="px-2 py-3 sm:p-4 text-center">
                 <input
                   type="checkbox"
                   :value="voter.id || voter.ID"
                   v-model="selectedVoters"
-                  class="w-4 h-4 text-[#800000] border-[#d6d3d1] rounded focus:ring-[#800000] cursor-pointer"
+                  class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#800000] border-[#d6d3d1] rounded focus:ring-[#800000] cursor-pointer"
                 />
               </td>
-              <td class="p-4 font-mono text-[#0c0a09]">{{ voter.id || voter.ID }}</td>
-              <td class="p-4 font-medium text-[#0c0a09]">{{ voter.nama || voter.Nama }}</td>
-              <td class="p-4 text-center">
+              <td class="px-2 py-3 sm:p-4 font-mono text-[#0c0a09] whitespace-nowrap">
+                {{ voter.id || voter.ID }}
+              </td>
+              <td class="px-2 py-3 sm:p-4 font-medium text-[#0c0a09]">
+                {{ voter.nama || voter.Nama }}
+              </td>
+              <td class="px-2 py-3 sm:p-4 text-center">
                 <span
-                  class="px-3 py-1 text-[12px] font-bold rounded-full"
+                  class="px-2 sm:px-3 py-1 text-[10px] sm:text-[12px] font-bold rounded-full whitespace-nowrap"
                   :class="
                     hasVoted(voter) ? 'bg-[#dcfce7] text-[#166534]' : 'bg-[#f3f4f6] text-[#4b5563]'
                   "
@@ -94,14 +111,19 @@
                   {{ hasVoted(voter) ? 'Sudah Memilih' : 'Belum Memilih' }}
                 </span>
               </td>
-              <td class="p-4 text-center whitespace-nowrap">
-                <div class="flex justify-center gap-2">
+              <td class="px-2 py-3 sm:p-4 text-center whitespace-nowrap">
+                <div class="flex justify-center gap-1.5 sm:gap-2">
                   <button
                     @click="openEditModal(voter)"
-                    class="p-2 bg-[#f0efed] text-[#4e4e4e] hover:bg-[#e7e5e4] hover:text-[#800000] rounded-md transition-colors"
+                    class="p-1.5 sm:p-2 bg-[#f0efed] text-[#4e4e4e] hover:bg-[#e7e5e4] hover:text-[#800000] rounded-md transition-colors"
                     title="Edit Data"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      class="w-3.5 h-3.5 sm:w-4 sm:h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -112,13 +134,13 @@
                   </button>
                   <button
                     @click="handleDelete(voter.id || voter.ID)"
-                    class="p-2 bg-[#fee2e2] text-[#dc2626] hover:bg-[#fecaca] hover:text-[#991b1b] rounded-md transition-colors"
+                    class="p-1.5 sm:p-2 bg-[#fee2e2] text-[#dc2626] hover:bg-[#fecaca] hover:text-[#991b1b] rounded-md transition-colors"
                     title="Hapus Data"
                     :disabled="isDeleting === (voter.id || voter.ID)"
                   >
                     <div
                       v-if="isDeleting === (voter.id || voter.ID)"
-                      class="flex flex-row gap-0.5 justify-center items-center w-4 h-4"
+                      class="flex flex-row gap-0.5 justify-center items-center w-3.5 h-3.5 sm:w-4 sm:h-4"
                     >
                       <div class="w-1 h-1 rounded-full bg-current animate-bounce"></div>
                       <div
@@ -130,7 +152,7 @@
                     </div>
                     <svg
                       v-else
-                      class="w-4 h-4"
+                      class="w-3.5 h-3.5 sm:w-4 sm:h-4"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
