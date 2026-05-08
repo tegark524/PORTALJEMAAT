@@ -1,4 +1,3 @@
-isi gas
 const SS = SpreadsheetApp.getActiveSpreadsheet();
 
 /\*\*
@@ -8,12 +7,12 @@ const SS = SpreadsheetApp.getActiveSpreadsheet();
       function doGet(e) {
       const table = e.parameter.table;
       const sheet = SS.getSheetByName(table);
-      if (!sheet) return responseJson({"error": "Table not found"});
+      if (!sheet) return responseJson({ "error": "Table not found" });
 
 const data = sheet.getDataRange().getValues();
 const headers = data.shift();
 const today = new Date();
-today.setHours(0,0,0,0);
+today.setHours(0, 0, 0, 0);
 
 let result = data.map(row => {
 let obj = {};
@@ -63,192 +62,213 @@ return responseJson(result);
       const payload = JSON.parse(e.postData.contents);
       const action = payload.action;
 
-          // A. LOGIKA AUTHENTICATION (Admin & Voter)
-          if (action === 'verify_login') return handleAuth(payload.id_token);
+                // A. LOGIKA AUTHENTICATION (Admin & Voter)
+                if (action === 'verify_login') return handleAuth(payload.id_token || payload.token);
 
-          // Helper Validasi Jadwal Voting (Cek kolom E dan F)
-          const checkVotingSchedule = () => {
-            const sheetConfig = SS.getSheetByName('tb_voting_config');
-            if (!sheetConfig) return null;
-            const configData = sheetConfig.getDataRange().getValues();
-            if (configData.length < 2) return null;
-            const config = configData[1];
-            const waktuMulai = new Date(config[4]);
-            const waktuSelesai = new Date(config[5]);
-            const now = new Date();
-            if (now < waktuMulai) return "Bilik suara belum dibuka!";
-            if (now > waktuSelesai) return "Bilik suara telah ditutup!";
-            return null;
-          };
+                // Helper Validasi Jadwal Voting (Cek kolom E dan F)
+                const checkVotingSchedule = () => {
+                  const sheetConfig = SS.getSheetByName('tb_voting_config');
+                  if (!sheetConfig) return null;
+                  const configData = sheetConfig.getDataRange().getValues();
+                  if (configData.length < 2) return null;
+                  const config = configData[1];
+                  const waktuMulai = new Date(config[4]);
+                  const waktuSelesai = new Date(config[5]);
+                  const now = new Date();
+                  if (now < waktuMulai) return "Bilik suara belum dibuka!";
+                  if (now > waktuSelesai) return "Bilik suara telah ditutup!";
+                  return null;
+                };
 
-          // Verifikasi Pemilih (Jemaat)
-          if (action === 'verify_voter') {
-            const scheduleError = checkVotingSchedule();
-            if (scheduleError) return responseJson({"status": "error", "message": scheduleError});
+                // Verifikasi Pemilih (Jemaat)
+                if (action === 'verify_voter') {
+                  const scheduleError = checkVotingSchedule();
+                  if (scheduleError) return responseJson({ "status": "error", "message": scheduleError });
 
-            const sheet = SS.getSheetByName('tb_voter');
-            const data = sheet.getDataRange().getValues();
-            const voterId = payload.voter_id.toString().trim();
+                  const sheet = SS.getSheetByName('tb_voter');
+                  const data = sheet.getDataRange().getValues();
+                  const voterId = payload.voter_id.toString().trim();
 
-            const voter = data.find(row => row[0].toString() === voterId);
-            if (!voter) return responseJson({"status": "error", "message": "ID Jemaat tidak terdaftar"});
+                  const voter = data.find(row => row[0].toString() === voterId);
+                  if (!voter) return responseJson({ "status": "error", "message": "ID Jemaat tidak terdaftar" });
 
-            const sudahMemilih = voter[2] === true || voter[2] === "TRUE" || String(voter[2]).toLowerCase() === 'true';
-            if (sudahMemilih) return responseJson({"status": "error", "message": "Anda sudah menggunakan hak suara"});
+                  const sudahMemilih = voter[2] === true || voter[2] === "TRUE" || String(voter[2]).toLowerCase() === 'true';
+                  if (sudahMemilih) return responseJson({ "status": "error", "message": "Anda sudah menggunakan hak suara" });
 
-            return responseJson({"status": "success", "voter": { id: voter[0], nama: voter[1] }});
-          }
-
-          // B. LOGIKA VOTING (Submit Suara)
-          if (action === 'submit_vote') {
-            const scheduleError = checkVotingSchedule();
-            if (scheduleError) return responseJson({"status": "error", "message": scheduleError});
-
-            // Gunakan LockService untuk mencegah tabrakan data (Race Condition) saat banyak user voting bersamaan
-            const lock = LockService.getScriptLock();
-            try {
-              // Antre maksimal 10 detik. Jika dalam 10 detik server masih memproses ribuan data lain, lemparkan error ke frontend untuk coba lagi.
-              lock.waitLock(10000);
-
-              const sheetVoter = SS.getSheetByName('tb_voter');
-              const sheetSuara = SS.getSheetByName('tb_suara');
-              const dataVoter = sheetVoter.getDataRange().getValues();
-
-              // Keamanan: Cek ulang apakah sudah memilih di sisi server
-              for (let i = 1; i < dataVoter.length; i++) {
-                if (dataVoter[i][0].toString() === payload.voter_id.toString()) {
-                  if (dataVoter[i][2] === true || dataVoter[i][2] === "TRUE") {
-                    return responseJson({"status": "error", "message": "Kecurangan terdeteksi: Anda sudah memilih"});
-                  }
-                  // 1. Catat Suara (Anonim)
-                  sheetSuara.appendRow([Utilities.getUuid(), payload.candidate_id, new Date().toISOString()]);
-                  // 2. Tandai Pemilih
-                  sheetVoter.getRange(i + 1, 3).setValue(true);
-                  return responseJson({"status": "success", "message": "Suara berhasil direkam"});
+                  return responseJson({ "status": "success", "voter": { id: voter[0], nama: voter[1] } });
                 }
-              }
-              return responseJson({"status": "error", "message": "ID Pemilih tidak valid"});
 
-            } catch (e) {
-              // Jika lock penuh (Traffic sangat padat)
-              return responseJson({"status": "error", "message": "Sistem sedang padat menerima suara jemaat lain. Silakan klik kirim lagi."});
-            } finally {
-              // Wajib lepaskan gembok agar antrean berikutnya bisa masuk
-              lock.releaseLock();
-            }
-          }
+                // B. LOGIKA VOTING (Submit Suara)
+                if (action === 'submit_vote') {
+                  const scheduleError = checkVotingSchedule();
+                  if (scheduleError) return responseJson({ "status": "error", "message": scheduleError });
 
-          // C. LOGIKA CRUD & BULK INSERT
-          const sheet = SS.getSheetByName(payload.table);
-          if (!sheet) return responseJson({"status": "error", "message": "Sheet tidak ditemukan"});
+                  // Gunakan LockService untuk mencegah tabrakan data (Race Condition) saat banyak user voting bersamaan
+                  const lock = LockService.getScriptLock();
+                  try {
+                    // Antre maksimal 10 detik. Jika dalam 10 detik server masih memproses ribuan data lain, lemparkan error ke frontend untuk coba lagi.
+                    lock.waitLock(10000);
 
-          if (action === 'insert') {
-            sheet.appendRow(payload.data);
-            return responseJson({"status": "success", "message": "Data berhasil ditambah"});
-          }
+                    const sheetVoter = SS.getSheetByName('tb_voter');
+                    const sheetSuara = SS.getSheetByName('tb_suara');
+                    const dataVoter = sheetVoter.getDataRange().getValues();
 
-          if (action === 'bulk_insert') {
-            const dataToInsert = payload.data; // Array 2D [[id, nama, status, ts], ...]
-            sheet.getRange(sheet.getLastRow() + 1, 1, dataToInsert.length, dataToInsert[0].length).setValues(dataToInsert);
-            return responseJson({"status": "success", "message": dataToInsert.length + " jemaat berhasil di-import"});
-          }
+                    // Keamanan: Cek ulang apakah sudah memilih di sisi server
+                    for (let i = 1; i < dataVoter.length; i++) {
+                      if (dataVoter[i][0].toString() === payload.voter_id.toString()) {
+                        if (dataVoter[i][2] === true || dataVoter[i][2] === "TRUE") {
+                          return responseJson({ "status": "error", "message": "Kecurangan terdeteksi: Anda sudah memilih" });
+                        }
+                        // 1. Catat Suara (Anonim)
+                        sheetSuara.appendRow([Utilities.getUuid(), payload.candidate_id, new Date().toISOString()]);
+                        // 2. Tandai Pemilih
+                        sheetVoter.getRange(i + 1, 3).setValue(true);
+                        return responseJson({ "status": "success", "message": "Suara berhasil direkam" });
+                      }
+                    }
+                    return responseJson({ "status": "error", "message": "ID Pemilih tidak valid" });
 
-          if (action === 'update') {
-            const data = sheet.getDataRange().getValues();
-            for (let i = 1; i < data.length; i++) {
-              if (data[i][0].toString() === payload.id.toString()) {
-                sheet.getRange(i + 1, 1, 1, payload.data.length).setValues([payload.data]);
-                return responseJson({"status": "success", "message": "Data diperbarui"});
-              }
-            }
-          }
+                  } catch (e) {
+                    // Jika lock penuh (Traffic sangat padat)
+                    return responseJson({ "status": "error", "message": "Sistem sedang padat menerima suara jemaat lain. Silakan klik kirim lagi." });
+                  } finally {
+                    // Wajib lepaskan gembok agar antrean berikutnya bisa masuk
+                    lock.releaseLock();
+                  }
+                }
 
-          if (action === 'delete') {
-            const data = sheet.getDataRange().getValues();
-            for (let i = 1; i < data.length; i++) {
-              if (data[i][0].toString() === payload.id.toString()) {
-                sheet.deleteRow(i + 1);
-                return responseJson({"status": "success", "message": "Data dihapus"});
-              }
-            }
-          }
+                // C. LOGIKA CRUD & BULK INSERT
+                const sheet = SS.getSheetByName(payload.table);
+                if (!sheet) return responseJson({ "status": "error", "message": "Sheet tidak ditemukan" });
 
-          return responseJson({"status": "error", "message": "Action unknown: " + action});
+                if (action === 'insert') {
+                  sheet.appendRow(payload.data);
+                  return responseJson({ "status": "success", "message": "Data berhasil ditambah" });
+                }
 
-      } catch (err) {
-      return responseJson({"status": "error", "message": err.toString()});
-      }
-      }
-      /\*\*
+                if (action === 'bulk_insert') {
+                  const dataToInsert = payload.data; // Array 2D [[id, nama, status, ts], ...]
+                  sheet.getRange(sheet.getLastRow() + 1, 1, dataToInsert.length, dataToInsert[0].length).setValues(dataToInsert);
+                  return responseJson({ "status": "success", "message": dataToInsert.length + " jemaat berhasil di-import" });
+                }
 
-- HELPER: Verifikasi ID Token Google & Cek Whitelist
+                if (action === 'update') {
+                  const data = sheet.getDataRange().getValues();
+                  for (let i = 1; i < data.length; i++) {
+                    if (data[i][0].toString() === payload.id.toString()) {
+                      sheet.getRange(i + 1, 1, 1, payload.data.length).setValues([payload.data]);
+                      return responseJson({ "status": "success", "message": "Data diperbarui" });
+                    }
+                  }
+                }
+
+                if (action === 'delete') {
+                  const data = sheet.getDataRange().getValues();
+                  for (let i = 1; i < data.length; i++) {
+                    if (data[i][0].toString() === payload.id.toString()) {
+                      sheet.deleteRow(i + 1);
+                      return responseJson({ "status": "success", "message": "Data dihapus" });
+                    }
+                  }
+                }
+
+                return responseJson({ "status": "error", "message": "Action unknown: " + action });
+
+} catch (err) {
+return responseJson({ "status": "error", "message": err.toString() });
+}
+}
+
+/\*\*
+
+- HELPER: Verifikasi ID Token / Access Token Google & Cek Whitelist
   \*/
-  function handleAuth(idToken) {
+  function handleAuth(token) {
   try {
   // 1. Pastikan token dibersihkan dari spasi / karakter enter tersembunyi
-  const cleanToken = idToken.toString().trim();
+  const cleanToken = token.toString().trim();
+  let userData = null;
 
-      // 2. Gunakan URL tokeninfo dasar
-      const authUrl = 'https://oauth2.googleapis.com/tokeninfo';
-
-      // 3. Gunakan method POST dan payload agar tidak error "Argumen tidak valid"
-      const options = {
-        method: 'post',
-        payload: {
-          id_token: cleanToken
-        },
-        muteHttpExceptions: true
-      };
-
-      const authResponse = UrlFetchApp.fetch(authUrl, options);
-
-      // 4. Cek respon otentikasi dari Google
-      if (authResponse.getResponseCode() !== 200) {
-        return responseJson({
-          status: 'error',
-          message: 'Google menolak token: ' + authResponse.getContentText()
-        });
-      }
-
-      const userData = JSON.parse(authResponse.getContentText());
-      const userEmail = userData.email.trim().toLowerCase();
-
-      // 5. Cek keberadaan sheet tb_admin_access
-      const sheet = SS.getSheetByName('tb_admin_access');
-      if (!sheet) {
-        return responseJson({
-          status: 'error',
-          message: 'Error di GAS: Sheet "tb_admin_access" belum dibuat!'
-        });
-      }
-
-      // 6. Validasi Whitelist (Cek email di Spreadsheet)
-      const whitelist = sheet.getDataRange().getValues().flat().map(email => email.toString().trim().toLowerCase());
-
-      if (whitelist.includes(userEmail)) {
-        return responseJson({
-          status: 'success',
-          user: {
-            name: userData.name,
-            email: userEmail,
-            picture: userData.picture
+        // 2. Coba validasi sebagai id_token terlebih dahulu
+        let authUrl = 'https://oauth2.googleapis.com/tokeninfo';
+        let options = {
+          method: 'post',
+          payload: {
+            id_token: cleanToken
           },
-          token: Utilities.getUuid() // Token sesi sementara
-        });
-      } else {
-        return responseJson({
-          status: 'forbidden',
-          message: 'Akses ditolak. Email tidak terdaftar di whitelist Majelis.'
-        });
-      }
+          muteHttpExceptions: true
+        };
+        let authResponse = UrlFetchApp.fetch(authUrl, options);
 
-  } catch (e) {
-  return responseJson({
-  status: 'error',
-  message: 'Error Sistem GAS: ' + e.message
-  });
-  }
-  }
+        // 3. Cek respon otentikasi dari Google
+        if (authResponse.getResponseCode() === 200) {
+          userData = JSON.parse(authResponse.getContentText());
+        } else {
+          // Jika gagal, asumsikan token adalah access_token (dari custom button)
+          authUrl = 'https://www.googleapis.com/oauth2/v3/userinfo';
+          options = {
+            method: 'get',
+            headers: { 'Authorization': 'Bearer ' + cleanToken },
+            muteHttpExceptions: true
+          };
+          authResponse = UrlFetchApp.fetch(authUrl, options);
+
+          if (authResponse.getResponseCode() === 200) {
+            userData = JSON.parse(authResponse.getContentText());
+          } else {
+            return responseJson({
+              status: 'error',
+              message: 'Google menolak token: ' + authResponse.getContentText()
+            });
+          }
+        }
+
+            // 4. SAFEGUARD: Pastikan Google mengirimkan data email
+            if (!userData || !userData.email) {
+              return responseJson({
+                status: 'error',
+                message: 'Google menolak memberikan akses Email. Pastikan Anda mengizinkan profil dasar saat popup login.'
+              });
+            }
+
+        const userEmail = userData.email.trim().toLowerCase();
+
+        // 5. Cek keberadaan sheet tb_admin_access
+        const sheet = SS.getSheetByName('tb_admin_access');
+        if (!sheet) {
+          return responseJson({
+            status: 'error',
+            message: 'Error di GAS: Sheet "tb_admin_access" belum dibuat!'
+          });
+        }
+
+        // 6. Validasi Whitelist (Cek email di Spreadsheet)
+        const whitelist = sheet.getDataRange().getValues().flat().map(email => email.toString().trim().toLowerCase());
+
+        if (whitelist.includes(userEmail)) {
+          return responseJson({
+            status: 'success',
+            user: {
+              name: userData.name,
+              email: userEmail,
+              picture: userData.picture
+            },
+            token: Utilities.getUuid() // Token sesi sementara
+          });
+        } else {
+          return responseJson({
+            status: 'forbidden',
+            message: 'Akses ditolak. Email tidak terdaftar di whitelist Majelis.'
+          });
+        }
+
+} catch (e) {
+return responseJson({
+status: 'error',
+message: 'Error Sistem GAS: ' + e.message
+});
+}
+}
 
 /\*\*
 
@@ -265,15 +285,15 @@ return responseJson(result);
       \*/
       function autoCleanupSystem() {
       const today = new Date();
-      today.setHours(0,0,0,0);
+      today.setHours(0, 0, 0, 0);
 
 // Cleanup tb*renungan (Hanya simpan 7 hari terakhir)
 const sheetRenungan = SS.getSheetByName('tb_renungan');
 if (sheetRenungan) {
 const dataRenungan = sheetRenungan.getDataRange().getValues();
 for (let i = dataRenungan.length - 1; i >= 1; i--) {
-const tgl = new Date(dataRenungan[i][1]); // Kolom tanggal_tayang
-const diffDays = (today - tgl) / (1000 * 60 \_ 60 \* 24);
+const tgl = new Date(dataRenungan[i][1]);
+const diffDays = (today - tgl) / (1000 * 60 _ 60 _ 24);
 if (diffDays > 7) sheetRenungan.deleteRow(i + 1);
 }
 }
