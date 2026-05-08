@@ -14,7 +14,7 @@ const requireVotingActive = async (to, from, next) => {
     activeConfig === 'TRUE' ||
     String(activeConfig).toLowerCase() === 'true'
   if (!isVotingActive) {
-    next(to.path.startsWith('/admin') ? '/admin' : '/')
+    next('/') // Lempar ke Beranda Publik (karena ini hanya dipakai untuk URL Jemaat)
   } else {
     next()
   }
@@ -104,14 +104,14 @@ const router = createRouter({
           name: 'admin-voter',
           component: () => import('@/views/admin/VoterManager.vue'),
           meta: { title: 'Manajemen Pemilih' },
-          beforeEnter: [requireVotingActive, requireKPU],
+          beforeEnter: requireKPU,
         },
         {
           path: 'kandidat',
           name: 'admin-kandidat',
           component: () => import('@/views/admin/KandidatManager.vue'),
           meta: { title: 'Kelola Kandidat' },
-          beforeEnter: [requireVotingActive, requireKPU],
+          beforeEnter: requireKPU,
         },
         {
           path: 'voting-config',
@@ -125,9 +125,16 @@ const router = createRouter({
           name: 'admin-live-count',
           component: () => import('@/views/admin/LiveCount.vue'),
           meta: { title: 'Live Count Pemilihan' },
-          beforeEnter: [requireVotingActive, requireKPU],
+          beforeEnter: requireKPU,
         },
       ],
+    },
+    {
+      path: '/voting',
+      name: 'voting-home',
+      component: () => import('@/views/voting/VotingHomeView.vue'),
+      meta: { title: 'Portal Pemilihan Majelis' },
+      beforeEnter: requireVotingActive,
     },
     {
       path: '/voting/login',

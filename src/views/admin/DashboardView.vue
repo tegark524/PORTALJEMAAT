@@ -55,26 +55,24 @@
             class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
             >Konfigurasi Voting</router-link
           >
-          <template v-if="isVotingActive">
-            <router-link
-              to="/admin/kandidat"
-              active-class="bg-[#1c1917] text-[#ffffff]"
-              class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
-              >Kelola Kandidat</router-link
-            >
-            <router-link
-              to="/admin/voter"
-              active-class="bg-[#1c1917] text-[#ffffff]"
-              class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
-              >Manajemen Pemilih</router-link
-            >
-            <router-link
-              to="/admin/live-count"
-              active-class="bg-[#1c1917] text-[#ffffff]"
-              class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
-              >Live Count</router-link
-            >
-          </template>
+          <router-link
+            to="/admin/kandidat"
+            active-class="bg-[#1c1917] text-[#ffffff]"
+            class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
+            >Kelola Kandidat</router-link
+          >
+          <router-link
+            to="/admin/voter"
+            active-class="bg-[#1c1917] text-[#ffffff]"
+            class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
+            >Manajemen Pemilih</router-link
+          >
+          <router-link
+            to="/admin/live-count"
+            active-class="bg-[#1c1917] text-[#ffffff]"
+            class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
+            >Live Count</router-link
+          >
         </template>
       </nav>
       <div class="p-4 border-t border-[#1c1917]">
@@ -174,29 +172,27 @@
                 class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
                 >Konfigurasi Voting</router-link
               >
-              <template v-if="isVotingActive">
-                <router-link
-                  @click="isMobileMenuOpen = false"
-                  to="/admin/kandidat"
-                  active-class="bg-[#1c1917] text-[#ffffff]"
-                  class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
-                  >Kelola Kandidat</router-link
-                >
-                <router-link
-                  @click="isMobileMenuOpen = false"
-                  to="/admin/voter"
-                  active-class="bg-[#1c1917] text-[#ffffff]"
-                  class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
-                  >Manajemen Pemilih</router-link
-                >
-                <router-link
-                  @click="isMobileMenuOpen = false"
-                  to="/admin/live-count"
-                  active-class="bg-[#1c1917] text-[#ffffff]"
-                  class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
-                  >Live Count</router-link
-                >
-              </template>
+              <router-link
+                @click="isMobileMenuOpen = false"
+                to="/admin/kandidat"
+                active-class="bg-[#1c1917] text-[#ffffff]"
+                class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
+                >Kelola Kandidat</router-link
+              >
+              <router-link
+                @click="isMobileMenuOpen = false"
+                to="/admin/voter"
+                active-class="bg-[#1c1917] text-[#ffffff]"
+                class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
+                >Manajemen Pemilih</router-link
+              >
+              <router-link
+                @click="isMobileMenuOpen = false"
+                to="/admin/live-count"
+                active-class="bg-[#1c1917] text-[#ffffff]"
+                class="px-4 py-2.5 rounded-full text-[15px] font-medium text-[#a8a29e] hover:text-[#ffffff] hover:bg-[#1c1917] transition-colors"
+                >Live Count</router-link
+              >
             </template>
           </nav>
           <div class="p-4 border-t border-[#1c1917]">
@@ -468,15 +464,6 @@ const isMobileMenuOpen = ref(false)
 
 onMounted(() => {
   store.fetchVotingConfig()
-})
-
-const isVotingActive = computed(() => {
-  const activeConfig = store.votingConfig?.is_active
-  return (
-    activeConfig === true ||
-    activeConfig === 'TRUE' ||
-    String(activeConfig).toLowerCase() === 'true'
-  )
 })
 
 const renunganStatus = computed(() => {

@@ -133,7 +133,7 @@
           <button
             type="submit"
             :disabled="isSubmitting"
-            class="w-full bg-[#800000] text-white px-6 py-3.5 rounded-full text-[15px] font-bold hover:bg-[#500000] disabled:opacity-50 transition-colors shadow-md flex justify-center items-center h-12"
+            class="btn-send w-full justify-center h-14 disabled:opacity-50 shadow-md"
           >
             <div v-if="isSubmitting" class="flex flex-row gap-2 justify-center items-center">
               <div class="w-2 h-2 rounded-full bg-white animate-bounce"></div>
@@ -144,7 +144,25 @@
                 class="w-2 h-2 rounded-full bg-white animate-bounce [animation-delay:-.5s]"
               ></div>
             </div>
-            <span v-else>Kirim Pokok Doa</span>
+            <template v-else>
+              <div class="svg-wrapper-1 mr-2">
+                <div class="svg-wrapper">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                  >
+                    <path fill="none" d="M0 0h24v24H0z"></path>
+                    <path
+                      fill="currentColor"
+                      d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"
+                    ></path>
+                  </svg>
+                </div>
+              </div>
+              <span>Kirim Pokok Doa</span>
+            </template>
           </button>
           <p v-if="errorMsg" class="text-[#dc2626] text-[14px] mt-2 text-center">{{ errorMsg }}</p>
         </div>
@@ -273,3 +291,57 @@ const submitRequest = async () => {
   }
 }
 </script>
+
+<style scoped>
+.btn-send {
+  font-family: inherit;
+  font-size: 16px;
+  background: #800000;
+  color: white;
+  display: flex;
+  align-items: center;
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.btn-send span {
+  display: block;
+  margin-left: 0.5em;
+  font-weight: 700;
+  transition: all 0.3s ease-in-out;
+}
+
+.btn-send svg {
+  display: block;
+  transform-origin: center center;
+  transition: transform 0.3s ease-in-out;
+}
+
+.btn-send:hover:not(:disabled) .svg-wrapper {
+  animation: fly-1 0.6s ease-in-out infinite alternate;
+}
+
+.btn-send:hover:not(:disabled) svg {
+  transform: translateX(1.2em) rotate(45deg) scale(1.1);
+}
+
+.btn-send:hover:not(:disabled) span {
+  transform: translateX(25em);
+}
+
+.btn-send:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+@keyframes fly-1 {
+  from {
+    transform: translateY(0.1em);
+  }
+  to {
+    transform: translateY(-0.1em);
+  }
+}
+</style>

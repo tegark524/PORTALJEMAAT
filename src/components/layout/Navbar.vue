@@ -169,7 +169,7 @@ const navLinks = computed(() => {
     String(activeConfig).toLowerCase() === 'true'
 
   if (isVotingActive) {
-    links.push({ name: 'Voting Majelis', path: '/voting/login', hash: '' })
+    links.push({ name: 'Voting Majelis', path: '/voting', hash: '' })
   }
 
   return links

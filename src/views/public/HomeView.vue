@@ -12,7 +12,7 @@
       @mouseleave="startSlide"
     >
       <h2
-        class="font-serif text-[36px] font-bold text-[#0c0a09] tracking-[-0.36px] mb-6 text-center uppercase"
+        class="font-serif text-[24px] sm:text-[28px] md:text-[36px] font-bold text-[#0c0a09] tracking-[-0.36px] mb-6 text-center uppercase"
       >
         Warta Jemaat
       </h2>
@@ -41,6 +41,8 @@
               class="w-full h-full object-cover opacity-40 mix-blend-overlay transition-transform duration-1000 group-hover:scale-105"
               alt="Media Headline"
             />
+            <!-- Added overlay for better text readability as requested -->
+            <div class="absolute inset-0 bg-black/50"></div>
             <div
               class="absolute inset-0 bg-gradient-to-t from-[#0c0a09] via-[#0c0a09]/80 to-transparent pointer-events-none"
             ></div>
@@ -51,7 +53,7 @@
             class="relative z-20 p-8 md:p-12 lg:p-16 flex flex-col justify-end h-full w-full max-w-4xl"
           >
             <h2
-              class="font-serif text-[28px] sm:text-[32px] md:text-[40px] lg:text-[48px] leading-[1.1] mb-4 text-white drop-shadow-lg line-clamp-2 hover:text-gray-300 cursor-pointer transition-colors"
+              class="font-serif text-3xl md:text-5xl leading-[1.1] mb-4 text-white drop-shadow-lg line-clamp-2 hover:text-gray-300 cursor-pointer transition-colors"
               @click="openModal(item.raw)"
             >
               {{ item.title }}
@@ -110,10 +112,10 @@
               {{ item.desc }}
             </p>
 
-            <div class="flex flex-wrap gap-3">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mt-6">
               <button
                 @click="openModal(item.raw)"
-                class="self-start bg-white text-[#0c0a09] px-6 py-2.5 rounded-full text-[13px] md:text-[14px] font-bold hover:bg-gray-200 transition-colors"
+                class="w-full sm:w-auto justify-center text-center bg-white/90 text-black font-bold py-3 px-6 rounded-full hover:bg-white transition-colors text-[14px]"
               >
                 Baca Selengkapnya
               </button>
@@ -122,17 +124,36 @@
                 :href="item.link"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="self-start bg-[#800000] text-white px-6 py-2.5 rounded-full text-[13px] md:text-[14px] font-bold hover:bg-[#500000] transition-colors flex items-center gap-2"
+                class="tautan-button white-mode w-full sm:w-auto justify-center"
+                style="--clr: #ffffff"
               >
-                Buka Tautan
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  ></path>
-                </svg>
+                <span>Buka Tautan</span>
+                <span class="tautan-button__icon-wrapper">
+                  <svg
+                    viewBox="0 0 14 15"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="tautan-button__icon-svg"
+                    width="10"
+                  >
+                    <path
+                      d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.28-9.224-.048 6.912 2.456.024z"
+                      fill="currentColor"
+                    ></path>
+                  </svg>
+                  <svg
+                    viewBox="0 0 14 15"
+                    fill="none"
+                    width="10"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="tautan-button__icon-svg tautan-button__icon-svg--copy"
+                  >
+                    <path
+                      d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.28-9.224-.048 6.912 2.456.024z"
+                      fill="currentColor"
+                    ></path>
+                  </svg>
+                </span>
               </a>
             </div>
           </div>
@@ -187,9 +208,11 @@
     </section>
 
     <!-- Renungan Harian Banner Section -->
-    <section id="renungan" class="py-12 px-6 md:px-12 max-w-6xl mx-auto">
+    <section id="renungan" class="py-12 px-6 md:px-12 max-w-6xl mx-auto scroll-mt-24">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <h2 class="font-serif text-[36px] font-bold text-[#0c0a09] tracking-[-0.36px]">
+        <h2
+          class="font-serif text-[24px] sm:text-[28px] md:text-[36px] font-bold text-[#0c0a09] tracking-[-0.36px]"
+        >
           Renungan Harian
         </h2>
       </div>
@@ -203,20 +226,21 @@
         ></div>
 
         <div class="flex-1 w-full relative z-10">
-          <div class="flex items-center gap-3 mb-5">
+          <div class="flex items-center gap-2 mb-5">
             <span
-              class="bg-[#f5f5f5] text-[#0c0a09] text-[10px] font-bold uppercase tracking-[0.96px] px-3 py-1.5 rounded-full border border-[#e7e5e4]"
-              >Renungan Terbaru</span
+              class="bg-[#f5f5f5] text-[#0c0a09] text-[10px] font-bold uppercase tracking-[0.96px] px-3 py-1.5 rounded-full border border-[#e7e5e4] shrink-0"
+              >Terbaru</span
             >
             <span
               v-if="latestRenungan"
-              class="text-[#777169] text-[13px] font-medium tracking-wide"
-              >{{
+              class="text-[#777169] text-[12px] sm:text-[13px] font-medium tracking-wide truncate"
+            >
+              {{
                 formatDate(
                   latestRenungan.tanggal_tayang || latestRenungan.tanggal || latestRenungan.date,
                 )
-              }}</span
-            >
+              }}
+            </span>
           </div>
 
           <div v-if="store.isLoading" class="animate-pulse">
@@ -240,9 +264,10 @@
             </p>
             <button
               @click="openModal(latestRenungan)"
-              class="self-start bg-transparent border border-[#0c0a09] text-[#0c0a09] px-6 py-2.5 rounded-full text-[14px] font-bold hover:bg-[#0c0a09] hover:text-[#ffffff] transition-colors"
+              class="selengkapnya-link text-[14px] self-start mt-2"
+              style="--link-color: #0c0a09"
             >
-              Baca Renungan Penuh
+              Baca Selengkapnya
             </button>
           </div>
           <div v-else class="text-[#777169] text-[16px]">Belum ada renungan tersedia.</div>
@@ -277,10 +302,8 @@
             >
               {{ renungan.isi_renungan || renungan.isi || renungan.content }}
             </p>
-            <span
-              class="mt-auto self-start text-[#800000] text-[13px] font-bold font-sans flex items-center gap-1 group-hover:underline"
-            >
-              Baca Renungan &rarr;
+            <span class="selengkapnya-link text-[13px] mt-auto self-start mr-2">
+              Baca Selengkapnya
             </span>
           </div>
         </div>
@@ -298,13 +321,15 @@
     </section>
 
     <!-- Jadwal Ibadah Section -->
-    <section id="jadwal" class="py-12 px-6 md:px-12 max-w-6xl mx-auto relative">
+    <section id="jadwal" class="py-12 px-6 md:px-12 max-w-6xl mx-auto relative scroll-mt-24">
       <div
         class="absolute top-1/2 -left-32 w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(167,229,211,0.25)_0%,transparent_70%)] blur-3xl -z-10 pointer-events-none"
       ></div>
 
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <h2 class="font-serif text-[36px] font-bold text-[#0c0a09] tracking-[-0.36px]">
+        <h2
+          class="font-serif text-[24px] sm:text-[28px] md:text-[36px] font-bold text-[#0c0a09] tracking-[-0.36px]"
+        >
           Jadwal Ibadah
         </h2>
       </div>
@@ -313,9 +338,11 @@
     </section>
 
     <!-- Warta Jemaat List Section -->
-    <section id="warta-list" class="py-12 px-6 md:px-12 max-w-6xl mx-auto">
+    <section id="warta-list" class="py-12 px-6 md:px-12 max-w-6xl mx-auto scroll-mt-24">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <h2 class="font-serif text-[36px] font-bold text-[#0c0a09] tracking-[-0.36px]">
+        <h2
+          class="font-serif text-[24px] sm:text-[28px] md:text-[36px] font-bold text-[#0c0a09] tracking-[-0.36px]"
+        >
           Warta Lainnya
         </h2>
 
@@ -369,20 +396,36 @@
             @click.stop
           >
             <div class="p-8 overflow-y-auto">
-              <button
-                @click="closeModal"
-                class="absolute top-6 right-6 text-[#a8a29e] hover:text-[#0c0a09] bg-[#f5f5f5] hover:bg-[#e7e5e4] rounded-full p-2 transition-colors"
-              >
-                <span class="sr-only">Close</span>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  ></path>
-                </svg>
-              </button>
+              <div class="absolute top-6 right-6 flex gap-2">
+                <button
+                  @click="shareContent(selectedItem)"
+                  class="text-[#a8a29e] hover:text-[#0c0a09] bg-[#f5f5f5] hover:bg-[#e7e5e4] rounded-full p-2 transition-colors"
+                  title="Bagikan"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                    ></path>
+                  </svg>
+                </button>
+                <button
+                  @click="closeModal"
+                  class="text-[#a8a29e] hover:text-[#0c0a09] bg-[#f5f5f5] hover:bg-[#e7e5e4] rounded-full p-2 transition-colors"
+                >
+                  <span class="sr-only">Close</span>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    ></path>
+                  </svg>
+                </button>
+              </div>
 
               <p class="text-[12px] font-semibold tracking-[0.96px] text-[#800000] uppercase mb-4">
                 {{
@@ -481,6 +524,45 @@
                   selectedItem?.excerpt ||
                   selectedItem?.keterangan
                 }}
+              </div>
+
+              <!-- Tombol Buka Tautan -->
+              <div v-if="selectedItem?.link" class="mt-8 flex justify-start">
+                <a
+                  :href="selectedItem.link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="tautan-button"
+                  style="--clr: #800000"
+                >
+                  <span>Buka Tautan</span>
+                  <span class="tautan-button__icon-wrapper">
+                    <svg
+                      viewBox="0 0 14 15"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="tautan-button__icon-svg"
+                      width="10"
+                    >
+                      <path
+                        d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.28-9.224-.048 6.912 2.456.024z"
+                        fill="currentColor"
+                      ></path>
+                    </svg>
+                    <svg
+                      viewBox="0 0 14 15"
+                      fill="none"
+                      width="10"
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="tautan-button__icon-svg tautan-button__icon-svg--copy"
+                    >
+                      <path
+                        d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.28-9.224-.048 6.912 2.456.024z"
+                        fill="currentColor"
+                      ></path>
+                    </svg>
+                  </span>
+                </a>
               </div>
             </div>
           </div>
@@ -619,6 +701,26 @@ const formatDate = (dateString) => {
   })
 }
 
+const getHari = (dateString) => {
+  if (!dateString) return ''
+  const d = new Date(dateString)
+  if (isNaN(d.getTime())) return ''
+  return d.toLocaleDateString('id-ID', {
+    weekday: 'long',
+  })
+}
+
+const getTanggalOnly = (dateString) => {
+  if (!dateString) return ''
+  const d = new Date(dateString)
+  if (isNaN(d.getTime())) return dateString // return original jika format tidak valid
+  return d.toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+}
+
 const store = useChurchStore()
 const searchQuery = ref('')
 const isModalOpen = ref(false)
@@ -704,6 +806,62 @@ const closeModal = () => {
     selectedItem.value = null
   }, 200) // Clear after exit animation
   document.body.style.overflow = 'auto'
+}
+
+const shareContent = async (item) => {
+  if (!item) return
+
+  const url = window.location.origin // Mengambil link website utama (misal: https://gkjwsukolilo.org)
+  const dateStr = item.tanggal_tayang || item.tanggal || item.date
+  const formattedDate = formatDate(dateStr)
+
+  let shareText = `${url}\n`
+
+  // 1. Format untuk Renungan
+  if (item.nats !== undefined) {
+    shareText += `${formattedDate}\n\n`
+    shareText += `${item.nats}\n\n`
+    shareText += `${item.isi_renungan || item.isi || item.content || ''}`
+  }
+  // 2. Format untuk Jadwal Ibadah
+  else if (item.waktu !== undefined || item.lokasi !== undefined) {
+    shareText += `Hari, Tanggal : ${formattedDate}\n`
+    if (item.waktu) shareText += `Waktu : Pk. ${formatWaktu(item.waktu)} WIB\n`
+    if (item.lokasi) shareText += `Tempat : ${item.lokasi}\n`
+    shareText += `Tema / Ibadah : ${item.judul || item.nama_ibadah || item.kategori || ''}\n`
+
+    const catatan = item.keterangan || item.desc || item.isi || ''
+    if (catatan) {
+      shareText += `Catatan : \n${catatan}\n`
+    }
+  }
+  // 3. Format untuk Warta Umum
+  else {
+    shareText += `Hari, Tanggal : ${formattedDate}\n`
+    shareText += `Warta : ${item.judul || item.title || item.kategori || ''}\n\n`
+    shareText += `${item.isi || item.content || item.ringkasan || item.excerpt || ''}`
+  }
+
+  if (navigator.share) {
+    try {
+      // Hanya mengirimkan 'text' saja agar layoutnya persis seperti contoh yang Anda berikan
+      await navigator.share({
+        text: shareText,
+      })
+    } catch (err) {
+      console.error('Gagal membagikan:', err)
+    }
+  } else {
+    // Fallback untuk browser yang tidak mendukung Web Share API (seperti desktop lama)
+    navigator.clipboard
+      .writeText(shareText)
+      .then(() => {
+        alert('Informasi berhasil disalin ke clipboard! Silakan paste (tempel) di chat.')
+      })
+      .catch((err) => {
+        console.error('Gagal menyalin teks: ', err)
+      })
+  }
 }
 
 // Schedule Logic: Filter schedules that haven't passed
@@ -836,3 +994,125 @@ const pastRenungan = computed(() => {
   return sortedRenungan.value.slice(1)
 })
 </script>
+
+<style>
+html {
+  scroll-behavior: smooth;
+}
+</style>
+
+<style scoped>
+.selengkapnya-link {
+  color: var(--link-color, #800000);
+  line-height: 2;
+  position: relative;
+  padding-right: 4px;
+  font-weight: 700;
+  cursor: pointer;
+  background: none;
+  border: none;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.selengkapnya-link:hover,
+.group:hover .selengkapnya-link {
+  text-decoration: underline;
+}
+
+.selengkapnya-link::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-top: solid 2px var(--link-color, #800000);
+  border-right: solid 2px var(--link-color, #800000);
+  border-radius: 1px;
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%) rotate(45deg);
+  transition: transform 0.4s;
+}
+
+.selengkapnya-link:hover::before,
+.group:hover .selengkapnya-link::before {
+  transform: translateX(4px) translateY(-50%) rotate(45deg);
+}
+
+.selengkapnya-link.white {
+  --link-color: #ffffff;
+}
+
+.tautan-button {
+  line-height: 1.5;
+  text-decoration: none;
+  display: inline-flex;
+  border: none;
+  cursor: pointer;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: var(--clr);
+  color: #fff;
+  border-radius: 10rem;
+  font-weight: 700;
+  padding: 0.75rem 1.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background-color 0.3s;
+  font-size: 14px;
+}
+
+.tautan-button.white-mode {
+  color: #0c0a09;
+}
+
+.tautan-button.white-mode .tautan-button__icon-wrapper {
+  background-color: #0c0a09;
+  color: #ffffff;
+}
+
+.tautan-button.white-mode:hover {
+  background-color: #e7e5e4;
+}
+
+.tautan-button__icon-wrapper {
+  flex-shrink: 0;
+  width: 25px;
+  height: 25px;
+  position: relative;
+  color: var(--clr);
+  background-color: #fff;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.tautan-button:hover {
+  background-color: #000;
+}
+
+.tautan-button:hover .tautan-button__icon-wrapper {
+  color: #000;
+}
+
+.tautan-button.white-mode:hover .tautan-button__icon-wrapper {
+  color: #ffffff;
+}
+
+.tautan-button__icon-svg--copy {
+  position: absolute;
+  transform: translate(-150%, 150%);
+}
+
+.tautan-button:hover .tautan-button__icon-svg:first-child {
+  transition: transform 0.3s ease-in-out;
+  transform: translate(150%, -150%);
+}
+
+.tautan-button:hover .tautan-button__icon-svg--copy {
+  transition: transform 0.3s ease-in-out 0.1s;
+  transform: translate(0);
+}
+</style>

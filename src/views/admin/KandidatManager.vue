@@ -71,35 +71,59 @@
                   </button>
                   <button
                     @click="handleDelete(item.id)"
-                    class="p-2 bg-[#fee2e2] text-[#dc2626] hover:bg-[#fecaca] hover:text-[#991b1b] rounded-md transition-colors"
+                    class="bin-button"
+                    title="Hapus Data"
                     :disabled="isDeleting === item.id"
                   >
                     <div
                       v-if="isDeleting === item.id"
-                      class="flex flex-row gap-0.5 justify-center items-center w-4 h-4"
+                      class="flex flex-row gap-0.5 justify-center items-center w-full h-full"
                     >
-                      <div class="w-1 h-1 rounded-full bg-current animate-bounce"></div>
+                      <div class="w-1.5 h-1.5 rounded-full bg-white animate-bounce"></div>
                       <div
-                        class="w-1 h-1 rounded-full bg-current animate-bounce [animation-delay:-.3s]"
+                        class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-.3s]"
                       ></div>
                       <div
-                        class="w-1 h-1 rounded-full bg-current animate-bounce [animation-delay:-.5s]"
+                        class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-.5s]"
                       ></div>
                     </div>
-                    <svg
-                      v-else
-                      class="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      ></path>
-                    </svg>
+                    <template v-else>
+                      <svg
+                        class="bin-top"
+                        viewBox="0 0 39 7"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <line y1="5" x2="39" y2="5" stroke="white" stroke-width="4"></line>
+                        <line
+                          x1="12"
+                          y1="1.5"
+                          x2="26.0357"
+                          y2="1.5"
+                          stroke="white"
+                          stroke-width="3"
+                        ></line>
+                      </svg>
+                      <svg
+                        class="bin-bottom"
+                        viewBox="0 0 33 39"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <mask id="path-1-inside-1_8_19" fill="white">
+                          <path
+                            d="M0 0H33V35C33 37.2091 31.2091 39 29 39H4C1.79086 39 0 37.2091 0 35V0Z"
+                          ></path>
+                        </mask>
+                        <path
+                          d="M0 0H33H0ZM37 35C37 39.4183 33.4183 43 29 43H4C-0.418278 43 -4 39.4183 -4 35H4H29H37ZM4 43C-0.418278 43 -4 39.4183 -4 35V0H4V35V43ZM37 0V35C37 39.4183 33.4183 43 29 43V35V0H37Z"
+                          fill="white"
+                          mask="url(#path-1-inside-1_8_19)"
+                        ></path>
+                        <path d="M12 6L12 29" stroke="white" stroke-width="4"></path>
+                        <path d="M21 6V29" stroke="white" stroke-width="4"></path>
+                      </svg>
+                    </template>
                   </button>
                 </div>
               </td>
@@ -365,3 +389,40 @@ const handleDelete = async (id) => {
   }
 }
 </script>
+
+<style scoped>
+.bin-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background-color: rgb(255, 95, 95);
+  cursor: pointer;
+  border: 2px solid rgb(255, 201, 201);
+  transition-duration: 0.3s;
+}
+.bin-bottom {
+  width: 11px;
+}
+.bin-top {
+  width: 12px;
+  transform-origin: right;
+  transition-duration: 0.3s;
+}
+.bin-button:hover:not(:disabled) .bin-top {
+  transform: rotate(45deg);
+}
+.bin-button:hover:not(:disabled) {
+  background-color: rgb(255, 0, 0);
+}
+.bin-button:active:not(:disabled) {
+  transform: scale(0.9);
+}
+.bin-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+</style>

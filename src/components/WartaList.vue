@@ -58,10 +58,8 @@
             <p class="text-[#4e4e4e] font-medium text-[14px] line-clamp-3 mb-4 flex-1">
               {{ item.isi || item.content || item.ringkasan }}
             </p>
-            <span
-              class="text-[#800000] text-[13px] font-bold mt-auto group-hover:underline flex items-center gap-1"
-            >
-              Baca Selengkapnya &rarr;
+            <span class="selengkapnya-link text-[13px] mt-auto self-start mr-2">
+              Baca Selengkapnya
             </span>
           </div>
         </div>
@@ -96,3 +94,42 @@ defineEmits(['read-more'])
 
 const showAll = ref(false)
 </script>
+
+<style scoped>
+.selengkapnya-link {
+  color: var(--link-color, #800000);
+  line-height: 2;
+  position: relative;
+  padding-right: 4px;
+  font-weight: 700;
+  cursor: pointer;
+  background: none;
+  border: none;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.selengkapnya-link:hover,
+.group:hover .selengkapnya-link {
+  text-decoration: underline;
+}
+
+.selengkapnya-link::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-top: solid 2px var(--link-color, #800000);
+  border-right: solid 2px var(--link-color, #800000);
+  border-radius: 1px;
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%) rotate(45deg);
+  transition: transform 0.4s;
+}
+
+.selengkapnya-link:hover::before,
+.group:hover .selengkapnya-link::before {
+  transform: translateX(4px) translateY(-50%) rotate(45deg);
+}
+</style>

@@ -122,28 +122,43 @@
               </div>
             </div>
 
-            <div class="mt-auto flex items-center justify-between gap-2 pt-2">
-              <span
-                class="text-[#800000] text-[13px] font-bold group-hover:underline flex items-center gap-1"
-              >
-                Selengkapnya &rarr;
-              </span>
+            <div class="mt-auto flex items-center justify-between gap-6 pt-2">
+              <span class="selengkapnya-link text-[13px]"> Selengkapnya </span>
               <a
                 v-if="item.link"
                 :href="item.link"
                 target="_blank"
                 @click.stop
-                class="inline-flex items-center gap-1.5 bg-[#800000] hover:bg-[#500000] text-white px-4 py-2 rounded-full text-[13px] font-bold transition-colors shadow-sm"
+                class="tautan-button"
+                style="--clr: #800000"
               >
-                Buka Tautan
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  ></path>
-                </svg>
+                <span>Buka Tautan</span>
+                <span class="tautan-button__icon-wrapper">
+                  <svg
+                    viewBox="0 0 14 15"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="tautan-button__icon-svg"
+                    width="10"
+                  >
+                    <path
+                      d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.28-9.224-.048 6.912 2.456.024z"
+                      fill="currentColor"
+                    ></path>
+                  </svg>
+                  <svg
+                    viewBox="0 0 14 15"
+                    fill="none"
+                    width="10"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="tautan-button__icon-svg tautan-button__icon-svg--copy"
+                  >
+                    <path
+                      d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.28-9.224-.048 6.912 2.456.024z"
+                      fill="currentColor"
+                    ></path>
+                  </svg>
+                </span>
               </a>
             </div>
           </div>
@@ -230,3 +245,98 @@ const formatDateDisplay = (dateStr) => {
   }
 }
 </script>
+
+<style scoped>
+.selengkapnya-link {
+  color: var(--link-color, #800000);
+  line-height: 2;
+  position: relative;
+  padding-right: 4px;
+  font-weight: 700;
+  cursor: pointer;
+  background: none;
+  border: none;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.selengkapnya-link:hover,
+.group:hover .selengkapnya-link {
+  text-decoration: underline;
+}
+
+.selengkapnya-link::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-top: solid 2px var(--link-color, #800000);
+  border-right: solid 2px var(--link-color, #800000);
+  border-radius: 1px;
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%) rotate(45deg);
+  transition: transform 0.4s;
+}
+
+.selengkapnya-link:hover::before,
+.group:hover .selengkapnya-link::before {
+  transform: translateX(4px) translateY(-50%) rotate(45deg);
+}
+
+.tautan-button {
+  line-height: 1.5;
+  text-decoration: none;
+  display: inline-flex;
+  border: none;
+  cursor: pointer;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: var(--clr);
+  color: #fff;
+  border-radius: 10rem;
+  font-weight: 700;
+  padding: 0.75rem 1.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background-color 0.3s;
+  font-size: 14px;
+}
+
+.tautan-button__icon-wrapper {
+  flex-shrink: 0;
+  width: 25px;
+  height: 25px;
+  position: relative;
+  color: var(--clr);
+  background-color: #fff;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.tautan-button:hover {
+  background-color: #000;
+}
+
+.tautan-button:hover .tautan-button__icon-wrapper {
+  color: #000;
+}
+
+.tautan-button__icon-svg--copy {
+  position: absolute;
+  transform: translate(-150%, 150%);
+}
+
+.tautan-button:hover .tautan-button__icon-svg:first-child {
+  transition: transform 0.3s ease-in-out;
+  transform: translate(150%, -150%);
+}
+
+.tautan-button:hover .tautan-button__icon-svg--copy {
+  transition: transform 0.3s ease-in-out 0.1s;
+  transform: translate(0);
+}
+</style>

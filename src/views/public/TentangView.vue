@@ -290,13 +290,9 @@
             </a>
 
             <!-- Social Icons -->
-            <div class="flex gap-4 pt-6 border-t border-[#e7e5e4]">
-              <a
-                href="#"
-                target="_blank"
-                class="w-12 h-12 rounded-full bg-[#0c0a09] text-white flex items-center justify-center hover:bg-[#800000] transition-colors shadow-sm"
-              >
-                <span class="sr-only">Instagram</span>
+            <div class="social-wrapper flex gap-4 pt-6 border-t border-[#e7e5e4]">
+              <a href="#" target="_blank" class="icon instagram">
+                <span class="tooltip">Instagram</span>
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path
                     fill-rule="evenodd"
@@ -305,12 +301,8 @@
                   ></path>
                 </svg>
               </a>
-              <a
-                href="#"
-                target="_blank"
-                class="w-12 h-12 rounded-full bg-[#0c0a09] text-white flex items-center justify-center hover:bg-[#800000] transition-colors shadow-sm"
-              >
-                <span class="sr-only">YouTube</span>
+              <a href="#" target="_blank" class="icon youtube">
+                <span class="tooltip">YouTube</span>
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                   <path
                     d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.377.55a3.015 3.015 0 0 0-2.122 2.136C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.55 9.376.55 9.376.55s7.505 0 9.377-.55a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
@@ -367,3 +359,130 @@ onMounted(() => {
     )
 })
 </script>
+
+<style scoped>
+.social-wrapper {
+  display: inline-flex;
+  list-style: none;
+}
+
+.social-wrapper .icon {
+  position: relative;
+  background: #0c0a09;
+  color: #fff;
+  z-index: 0;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  text-decoration: none;
+}
+
+.social-wrapper .icon::after {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  height: 100%;
+  width: 100%;
+  background-color: transparent;
+  z-index: -1;
+  border-radius: 50%;
+  top: 100%;
+}
+
+.social-wrapper .icon:hover:after {
+  animation: bg-pos 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1 both;
+  animation-timing-function: ease-in-out;
+}
+
+.social-wrapper .icon:hover {
+  color: #fff;
+  overflow: unset;
+  transition: color 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  animation: overflow-toggle 0.7s;
+}
+
+.social-wrapper .tooltip {
+  position: absolute;
+  top: 0;
+  font-size: 13px;
+  font-weight: 600;
+  background: #fff;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  white-space: nowrap;
+}
+
+.social-wrapper .tooltip::before {
+  position: absolute;
+  content: '';
+  height: 8px;
+  width: 8px;
+  background: #fff;
+  bottom: -3px;
+  left: 50%;
+  transform: translate(-50%) rotate(45deg);
+  transition: all 0.3s 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.social-wrapper .icon:hover .tooltip {
+  top: -45px;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.social-wrapper .icon:hover span,
+.social-wrapper .icon:hover .tooltip {
+  text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.1);
+}
+
+.social-wrapper .instagram::after {
+  background-color: #e4405f;
+}
+.social-wrapper .youtube::after {
+  background-color: #ff0000;
+}
+
+.social-wrapper .instagram:hover .tooltip,
+.social-wrapper .instagram:hover .tooltip::before {
+  background: #e4405f;
+  color: #fff;
+}
+
+.social-wrapper .youtube:hover .tooltip,
+.social-wrapper .youtube:hover .tooltip::before {
+  background: #ff0000;
+  color: #fff;
+}
+
+@keyframes bg-pos {
+  0% {
+    top: 100%;
+  }
+  100% {
+    top: 0;
+  }
+}
+
+@keyframes overflow-toggle {
+  0% {
+    overflow: hidden;
+  }
+  100% {
+    overflow: visible;
+  }
+}
+</style>
