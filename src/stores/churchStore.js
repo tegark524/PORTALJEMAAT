@@ -257,6 +257,7 @@ export const useChurchStore = defineStore('church', {
     },
 
     async login(id_token) {
+      console.log('TOKEN KE GAS:', id_token?.substring(0, 30))
       const url = import.meta.env.VITE_GAS_API_URL
       try {
         const response = await axios.post(
