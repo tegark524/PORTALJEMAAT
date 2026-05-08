@@ -76,8 +76,6 @@ const errorMsg = ref('')
 const isLoading = ref(false)
 
 const handleGoogleCallback = async (response) => {
-  console.log('RESPONSE GOOGLE:', JSON.stringify(response)) // Ditambahkan untuk pelacakan (debugging)
-
   errorMsg.value = '' // Clear previous errors
   isLoading.value = true
   try {
