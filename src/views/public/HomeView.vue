@@ -112,11 +112,8 @@
               {{ item.desc }}
             </p>
 
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mt-6">
-              <button
-                @click="openModal(item.raw)"
-                class="w-full sm:w-auto justify-center text-center bg-white/90 text-black font-bold py-3 px-6 rounded-full hover:bg-white transition-colors text-[14px]"
-              >
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6 mt-6">
+              <button @click="openModal(item.raw)" class="selengkapnya-link white text-[14px]">
                 Baca Selengkapnya
               </button>
               <a
@@ -620,7 +617,7 @@
       <!-- KHUSUS DESKTOP: Notifikasi Panah ke arah Navbar -->
       <div
         class="fixed top-[80px] z-[90] hidden md:flex pointer-events-auto transition-all duration-500"
-        :class="isVotingActive ? 'right-[15%] lg:right-[20%]' : 'right-[5%] lg:right-[10%]'"
+        :class="isVotingActive ? 'right-[15%] lg:right-[20%]' : 'right-[2%] lg:right-[8%]'"
       >
         <transition
           appear
