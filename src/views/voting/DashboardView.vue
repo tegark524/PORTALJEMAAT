@@ -1,5 +1,5 @@
 <template>
-  <main class="min-h-screen bg-[#f5f5f5] pb-24 pt-8 md:pt-12 px-6">
+  <main class="min-h-screen bg-[#f5f5f5] pb-24 pt-24 md:pt-32 px-6">
     <div class="max-w-4xl mx-auto">
       <!-- Header Bilik Suara -->
       <header

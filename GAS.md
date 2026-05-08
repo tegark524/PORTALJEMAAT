@@ -104,24 +104,38 @@ return responseJson(result);
             const scheduleError = checkVotingSchedule();
             if (scheduleError) return responseJson({"status": "error", "message": scheduleError});
 
-            const sheetVoter = SS.getSheetByName('tb_voter');
-            const sheetSuara = SS.getSheetByName('tb_suara');
-            const dataVoter = sheetVoter.getDataRange().getValues();
+            // Gunakan LockService untuk mencegah tabrakan data (Race Condition) saat banyak user voting bersamaan
+            const lock = LockService.getScriptLock();
+            try {
+              // Antre maksimal 10 detik. Jika dalam 10 detik server masih memproses ribuan data lain, lemparkan error ke frontend untuk coba lagi.
+              lock.waitLock(10000);
 
-            // Keamanan: Cek ulang apakah sudah memilih di sisi server
-            for (let i = 1; i < dataVoter.length; i++) {
-              if (dataVoter[i][0].toString() === payload.voter_id.toString()) {
-                if (dataVoter[i][2] === true || dataVoter[i][2] === "TRUE") {
-                  return responseJson({"status": "error", "message": "Kecurangan terdeteksi: Anda sudah memilih"});
+              const sheetVoter = SS.getSheetByName('tb_voter');
+              const sheetSuara = SS.getSheetByName('tb_suara');
+              const dataVoter = sheetVoter.getDataRange().getValues();
+
+              // Keamanan: Cek ulang apakah sudah memilih di sisi server
+              for (let i = 1; i < dataVoter.length; i++) {
+                if (dataVoter[i][0].toString() === payload.voter_id.toString()) {
+                  if (dataVoter[i][2] === true || dataVoter[i][2] === "TRUE") {
+                    return responseJson({"status": "error", "message": "Kecurangan terdeteksi: Anda sudah memilih"});
+                  }
+                  // 1. Catat Suara (Anonim)
+                  sheetSuara.appendRow([Utilities.getUuid(), payload.candidate_id, new Date().toISOString()]);
+                  // 2. Tandai Pemilih
+                  sheetVoter.getRange(i + 1, 3).setValue(true);
+                  return responseJson({"status": "success", "message": "Suara berhasil direkam"});
                 }
-                // 1. Catat Suara (Anonim)
-                sheetSuara.appendRow([Utilities.getUuid(), payload.candidate_id, new Date().toISOString()]);
-                // 2. Tandai Pemilih
-                sheetVoter.getRange(i + 1, 3).setValue(true);
-                return responseJson({"status": "success", "message": "Suara berhasil direkam"});
               }
+              return responseJson({"status": "error", "message": "ID Pemilih tidak valid"});
+
+            } catch (e) {
+              // Jika lock penuh (Traffic sangat padat)
+              return responseJson({"status": "error", "message": "Sistem sedang padat menerima suara jemaat lain. Silakan klik kirim lagi."});
+            } finally {
+              // Wajib lepaskan gembok agar antrean berikutnya bisa masuk
+              lock.releaseLock();
             }
-            return responseJson({"status": "error", "message": "ID Pemilih tidak valid"});
           }
 
           // C. LOGIKA CRUD & BULK INSERT
