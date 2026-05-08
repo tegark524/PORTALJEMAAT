@@ -185,6 +185,9 @@ return responseJson({ "status": "error", "message": err.toString() });
   \*/
   function handleAuth(token) {
   try {
+  // LOG UNTUK DEBUGGING (Bisa dilihat di menu Executions/Eksekusi GAS)
+  Logger.log('TOKEN DITERIMA: ' + token);
+
   // 1. Pastikan token dibersihkan dari spasi / karakter enter tersembunyi
   const cleanToken = token.toString().trim();
   let userData = null;
