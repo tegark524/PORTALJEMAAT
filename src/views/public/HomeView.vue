@@ -17,7 +17,11 @@
         Warta Jemaat
       </h2>
       <div
-        v-if="combinedHeadlines.length > 0"
+        v-if="store.isLoading"
+        class="relative w-full rounded-[24px] bg-[#e7e5e4] min-h-[350px] md:min-h-[450px] animate-pulse"
+      ></div>
+      <div
+        v-else-if="combinedHeadlines.length > 0"
         class="relative w-full overflow-hidden rounded-[24px] bg-[#0c0a09] text-white min-h-[350px] md:min-h-[450px] shadow-2xl flex group"
       >
         <div
@@ -240,9 +244,13 @@
             </span>
           </div>
 
-          <div v-if="store.isLoading" class="animate-pulse">
-            <div class="h-8 w-3/4 bg-[#e7e5e4] rounded mb-4"></div>
-            <div class="h-4 w-full bg-[#e7e5e4] rounded mb-2"></div>
+          <div
+            v-if="store.isLoading"
+            class="animate-pulse flex flex-col h-full justify-center py-2"
+          >
+            <div class="h-10 w-3/4 bg-[#e7e5e4] rounded mb-6"></div>
+            <div class="h-4 w-full bg-[#e7e5e4] rounded mb-3"></div>
+            <div class="h-4 w-full bg-[#e7e5e4] rounded mb-3"></div>
             <div class="h-4 w-5/6 bg-[#e7e5e4] rounded"></div>
           </div>
           <div v-else-if="latestRenungan" class="flex flex-col h-full">
@@ -272,7 +280,23 @@
       </div>
 
       <!-- Arsip Renungan Card Grid -->
-      <div v-if="pastRenungan.length > 0">
+      <div v-if="store.isLoading" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div
+          v-for="i in 3"
+          :key="i"
+          class="bg-[#faf7f2] rounded-[16px] p-6 border border-[#e7e5e4] shadow-sm flex flex-col h-[260px] animate-pulse"
+        >
+          <div class="h-3 w-24 bg-[#e7e5e4] rounded mb-4"></div>
+          <div class="h-6 w-full bg-[#e7e5e4] rounded mb-2"></div>
+          <div class="h-6 w-3/4 bg-[#e7e5e4] rounded mb-6"></div>
+          <div class="mt-auto space-y-3">
+            <div class="h-3 w-full bg-[#e7e5e4] rounded"></div>
+            <div class="h-3 w-full bg-[#e7e5e4] rounded"></div>
+            <div class="h-3 w-4/5 bg-[#e7e5e4] rounded"></div>
+          </div>
+        </div>
+      </div>
+      <div v-else-if="pastRenungan.length > 0">
         <div
           class="grid grid-cols-1 md:grid-cols-3 gap-6"
           :class="!showAllRenungan ? 'hidden md:grid' : ''"
@@ -617,7 +641,7 @@
       <!-- KHUSUS DESKTOP: Notifikasi Panah ke arah Navbar -->
       <div
         class="fixed top-[80px] z-[90] hidden md:flex pointer-events-auto transition-all duration-500"
-        :class="isVotingActive ? 'right-[15%] lg:right-[20%]' : 'right-[2%] lg:right-[8%]'"
+        :class="isVotingActive ? 'right-[18%] lg:right-[20%]' : 'right-[5%] lg:right-[10%]'"
       >
         <transition
           appear

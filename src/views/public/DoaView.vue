@@ -180,8 +180,19 @@
         <div
           v-for="i in 3"
           :key="i"
-          class="bg-[#faf7f2] h-48 rounded-[16px] animate-pulse border border-[#e7e5e4]"
-        ></div>
+          class="bg-[#faf7f2] rounded-[16px] p-6 border border-[#e7e5e4] min-h-[220px] flex flex-col animate-pulse shadow-sm"
+        >
+          <div class="flex justify-between items-center mb-6">
+            <div class="h-4 w-24 bg-[#e7e5e4] rounded"></div>
+            <div class="h-6 w-16 bg-[#e7e5e4] rounded-full"></div>
+          </div>
+          <div class="h-5 w-1/2 bg-[#e7e5e4] rounded mb-6"></div>
+          <div class="space-y-3 mt-auto">
+            <div class="h-3 w-full bg-[#e7e5e4] rounded"></div>
+            <div class="h-3 w-full bg-[#e7e5e4] rounded"></div>
+            <div class="h-3 w-3/4 bg-[#e7e5e4] rounded"></div>
+          </div>
+        </div>
       </div>
       <div
         v-else-if="publicRequests.length === 0"
