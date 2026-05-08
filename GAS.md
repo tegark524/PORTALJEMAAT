@@ -188,8 +188,9 @@ return responseJson({ "status": "error", "message": err.toString() });
   // 1. Pastikan token dibersihkan dari spasi / karakter enter tersembunyi
   const cleanToken = token.toString().trim();
   let userData = null;
+  let debugLog = "";
 
-        // 2. Coba validasi sebagai id_token terlebih dahulu
+      // 1. Percobaan Pertama: Validasi sebagai id_token (Bawaan Google)
         let authUrl = 'https://oauth2.googleapis.com/tokeninfo';
         let options = {
           method: 'post',
@@ -200,11 +201,21 @@ return responseJson({ "status": "error", "message": err.toString() });
         };
         let authResponse = UrlFetchApp.fetch(authUrl, options);
 
-        // 3. Cek respon otentikasi dari Google
         if (authResponse.getResponseCode() === 200) {
           userData = JSON.parse(authResponse.getContentText());
         } else {
-          // Jika gagal, asumsikan token adalah access_token (dari custom button)
+        debugLog += "[id_token: " + authResponse.getContentText() + "] ";
+
+        // 2. Percobaan Kedua: Validasi sebagai access_token via tokeninfo
+        options.payload = { access_token: cleanToken };
+        authResponse = UrlFetchApp.fetch(authUrl, options);
+
+        if (authResponse.getResponseCode() === 200) {
+          userData = JSON.parse(authResponse.getContentText());
+        } else {
+          debugLog += "[access_token: " + authResponse.getContentText() + "] ";
+
+          // 3. Percobaan Ketiga: Validasi via UserInfo Endpoint
           authUrl = 'https://www.googleapis.com/oauth2/v3/userinfo';
           options = {
             method: 'get',
@@ -218,9 +229,10 @@ return responseJson({ "status": "error", "message": err.toString() });
           } else {
             return responseJson({
               status: 'error',
-              message: 'Google menolak token: ' + authResponse.getContentText()
+              message: 'Login Gagal. Token ditolak Google. Log: ' + debugLog
             });
           }
+        }
         }
 
             // 4. SAFEGUARD: Pastikan Google mengirimkan data email

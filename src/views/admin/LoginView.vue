@@ -27,11 +27,7 @@
           <span class="ml-2 text-[#4e4e4e] font-medium text-[14px]">Memverifikasi akses...</span>
         </div>
         <div v-show="!isLoading">
-          <GoogleLogin
-            :callback="handleGoogleCallback"
-            popup-type="TOKEN"
-            scope="email profile openid"
-          >
+          <GoogleLogin :callback="handleGoogleCallback">
             <button class="button" type="button">
               <svg class="svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -83,10 +79,9 @@ const handleGoogleCallback = async (response) => {
   errorMsg.value = '' // Clear previous errors
   isLoading.value = true
   try {
-    // Karena kita pakai tombol kustom, token bisa berupa access_token atau credential
-    const token = response.credential || response.access_token
+    const token = response.credential || response.access_token || response.code
     if (!token) {
-      throw new Error('Login gagal. Log dari Google: ' + JSON.stringify(response))
+      throw new Error('Login gagal. Tidak ada token: ' + JSON.stringify(response))
     }
 
     await store.login(token)
