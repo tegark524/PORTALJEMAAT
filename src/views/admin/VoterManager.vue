@@ -77,120 +77,139 @@
             </tr>
           </thead>
           <tbody class="text-[#4e4e4e] text-xs sm:text-[14px]">
-            <tr v-if="filteredVoters.length === 0">
-              <td colspan="5" class="p-4 sm:p-8 text-center text-[#a8a29e]">
-                Tidak ada data pemilih ditemukan.
-              </td>
-            </tr>
-            <tr
-              v-for="voter in filteredVoters"
-              :key="voter.id || voter.ID"
-              class="hover:bg-[#fafafa] border-b border-[#e7e5e4] last:border-0"
-            >
-              <td class="px-2 py-3 sm:p-4 text-center">
-                <input
-                  type="checkbox"
-                  :value="voter.id || voter.ID"
-                  v-model="selectedVoters"
-                  class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#800000] border-[#d6d3d1] rounded focus:ring-[#800000] cursor-pointer"
-                />
-              </td>
-              <td class="px-2 py-3 sm:p-4 font-mono text-[#0c0a09] whitespace-nowrap">
-                {{ voter.id || voter.ID }}
-              </td>
-              <td class="px-2 py-3 sm:p-4 font-medium text-[#0c0a09]">
-                {{ voter.nama || voter.Nama }}
-              </td>
-              <td class="px-2 py-3 sm:p-4 text-center">
-                <span
-                  class="px-2 sm:px-3 py-1 text-[10px] sm:text-[12px] font-bold rounded-full whitespace-nowrap"
-                  :class="
-                    hasVoted(voter) ? 'bg-[#dcfce7] text-[#166534]' : 'bg-[#f3f4f6] text-[#4b5563]'
-                  "
-                >
-                  {{ hasVoted(voter) ? 'Sudah Memilih' : 'Belum Memilih' }}
-                </span>
-              </td>
-              <td class="px-2 py-3 sm:p-4 text-center whitespace-nowrap">
-                <div class="flex justify-center gap-1.5 sm:gap-2">
-                  <button
-                    @click="openEditModal(voter)"
-                    class="p-1.5 sm:p-2 bg-[#f0efed] text-[#4e4e4e] hover:bg-[#e7e5e4] hover:text-[#800000] rounded-md transition-colors"
-                    title="Edit Data"
+            <template v-if="store.isLoading && store.voters.length === 0">
+              <tr v-for="i in 5" :key="'skel-' + i" class="animate-pulse border-b border-[#e7e5e4]">
+                <td class="px-2 py-3 sm:p-4 text-center">
+                  <div class="h-4 w-4 bg-[#e7e5e4] rounded mx-auto"></div>
+                </td>
+                <td class="px-2 py-3 sm:p-4"><div class="h-4 bg-[#e7e5e4] rounded w-24"></div></td>
+                <td class="px-2 py-3 sm:p-4"><div class="h-4 bg-[#e7e5e4] rounded w-48"></div></td>
+                <td class="px-2 py-3 sm:p-4">
+                  <div class="h-6 bg-[#e7e5e4] rounded-full w-24 mx-auto"></div>
+                </td>
+                <td class="px-2 py-3 sm:p-4">
+                  <div class="h-8 bg-[#e7e5e4] rounded w-16 mx-auto"></div>
+                </td>
+              </tr>
+            </template>
+            <template v-else>
+              <tr
+                v-for="voter in filteredVoters"
+                :key="voter.id || voter.ID"
+                class="hover:bg-[#fafafa] border-b border-[#e7e5e4] last:border-0"
+              >
+                <td class="px-2 py-3 sm:p-4 text-center">
+                  <input
+                    type="checkbox"
+                    :value="voter.id || voter.ID"
+                    v-model="selectedVoters"
+                    class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#800000] border-[#d6d3d1] rounded focus:ring-[#800000] cursor-pointer"
+                  />
+                </td>
+                <td class="px-2 py-3 sm:p-4 font-mono text-[#0c0a09] whitespace-nowrap">
+                  {{ voter.id || voter.ID }}
+                </td>
+                <td class="px-2 py-3 sm:p-4 font-medium text-[#0c0a09]">
+                  {{ voter.nama || voter.Nama }}
+                </td>
+                <td class="px-2 py-3 sm:p-4 text-center">
+                  <span
+                    class="px-2 sm:px-3 py-1 text-[10px] sm:text-[12px] font-bold rounded-full whitespace-nowrap"
+                    :class="
+                      hasVoted(voter)
+                        ? 'bg-[#dcfce7] text-[#166534]'
+                        : 'bg-[#f3f4f6] text-[#4b5563]'
+                    "
                   >
-                    <svg
-                      class="w-3.5 h-3.5 sm:w-4 sm:h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                    {{ hasVoted(voter) ? 'Sudah Memilih' : 'Belum Memilih' }}
+                  </span>
+                </td>
+                <td class="px-2 py-3 sm:p-4 text-center whitespace-nowrap">
+                  <div class="flex justify-center gap-1.5 sm:gap-2">
+                    <button
+                      @click="openEditModal(voter)"
+                      class="p-1.5 sm:p-2 bg-[#f0efed] text-[#4e4e4e] hover:bg-[#e7e5e4] hover:text-[#800000] rounded-md transition-colors"
+                      title="Edit Data"
                     >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                      ></path>
-                    </svg>
-                  </button>
-                  <button
-                    @click="handleDelete(voter.id || voter.ID)"
-                    class="bin-button"
-                    title="Hapus Data"
-                    :disabled="isDeleting === (voter.id || voter.ID)"
-                  >
-                    <div
-                      v-if="isDeleting === (voter.id || voter.ID)"
-                      class="flex flex-row gap-0.5 justify-center items-center w-full h-full"
-                    >
-                      <div class="w-1.5 h-1.5 rounded-full bg-white animate-bounce"></div>
-                      <div
-                        class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-.3s]"
-                      ></div>
-                      <div
-                        class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-.5s]"
-                      ></div>
-                    </div>
-                    <template v-else>
                       <svg
-                        class="bin-top"
-                        viewBox="0 0 39 7"
+                        class="w-3.5 h-3.5 sm:w-4 sm:h-4"
                         fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
                       >
-                        <line y1="5" x2="39" y2="5" stroke="white" stroke-width="4"></line>
-                        <line
-                          x1="12"
-                          y1="1.5"
-                          x2="26.0357"
-                          y2="1.5"
-                          stroke="white"
-                          stroke-width="3"
-                        ></line>
-                      </svg>
-                      <svg
-                        class="bin-bottom"
-                        viewBox="0 0 33 39"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <mask id="path-1-inside-1_8_19" fill="white">
-                          <path
-                            d="M0 0H33V35C33 37.2091 31.2091 39 29 39H4C1.79086 39 0 37.2091 0 35V0Z"
-                          ></path>
-                        </mask>
                         <path
-                          d="M0 0H33H0ZM37 35C37 39.4183 33.4183 43 29 43H4C-0.418278 43 -4 39.4183 -4 35H4H29H37ZM4 43C-0.418278 43 -4 39.4183 -4 35V0H4V35V43ZM37 0V35C37 39.4183 33.4183 43 29 43V35V0H37Z"
-                          fill="white"
-                          mask="url(#path-1-inside-1_8_19)"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
                         ></path>
-                        <path d="M12 6L12 29" stroke="white" stroke-width="4"></path>
-                        <path d="M21 6V29" stroke="white" stroke-width="4"></path>
                       </svg>
-                    </template>
-                  </button>
-                </div>
-              </td>
-            </tr>
+                    </button>
+                    <button
+                      @click="handleDelete(voter.id || voter.ID)"
+                      class="bin-button"
+                      title="Hapus Data"
+                      :disabled="isDeleting === (voter.id || voter.ID)"
+                    >
+                      <div
+                        v-if="isDeleting === (voter.id || voter.ID)"
+                        class="flex flex-row gap-0.5 justify-center items-center w-full h-full"
+                      >
+                        <div class="w-1.5 h-1.5 rounded-full bg-white animate-bounce"></div>
+                        <div
+                          class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-.3s]"
+                        ></div>
+                        <div
+                          class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-.5s]"
+                        ></div>
+                      </div>
+                      <template v-else>
+                        <svg
+                          class="bin-top"
+                          viewBox="0 0 39 7"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <line y1="5" x2="39" y2="5" stroke="white" stroke-width="4"></line>
+                          <line
+                            x1="12"
+                            y1="1.5"
+                            x2="26.0357"
+                            y2="1.5"
+                            stroke="white"
+                            stroke-width="3"
+                          ></line>
+                        </svg>
+                        <svg
+                          class="bin-bottom"
+                          viewBox="0 0 33 39"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <mask id="path-1-inside-1_8_19" fill="white">
+                            <path
+                              d="M0 0H33V35C33 37.2091 31.2091 39 29 39H4C1.79086 39 0 37.2091 0 35V0Z"
+                            ></path>
+                          </mask>
+                          <path
+                            d="M0 0H33H0ZM37 35C37 39.4183 33.4183 43 29 43H4C-0.418278 43 -4 39.4183 -4 35H4H29H37ZM4 43C-0.418278 43 -4 39.4183 -4 35V0H4V35V43ZM37 0V35C37 39.4183 33.4183 43 29 43V35V0H37Z"
+                            fill="white"
+                            mask="url(#path-1-inside-1_8_19)"
+                          ></path>
+                          <path d="M12 6L12 29" stroke="white" stroke-width="4"></path>
+                          <path d="M21 6V29" stroke="white" stroke-width="4"></path>
+                        </svg>
+                      </template>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="filteredVoters.length === 0">
+                <td colspan="5" class="p-4 sm:p-8 text-center text-[#a8a29e]">
+                  Tidak ada data pemilih ditemukan.
+                </td>
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>

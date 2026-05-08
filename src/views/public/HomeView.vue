@@ -23,148 +23,152 @@
       <div
         v-else-if="combinedHeadlines.length > 0"
         class="relative w-full overflow-hidden rounded-[24px] bg-[#0c0a09] text-white min-h-[350px] md:min-h-[450px] shadow-2xl flex group"
+        @touchstart="handleTouchStart"
+        @touchend="handleTouchEnd"
       >
-        <div
-          v-for="(item, index) in combinedHeadlines"
-          :key="item.id"
-          class="absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out transform flex"
-          :class="
-            currentSlide === index
-              ? 'opacity-100 translate-x-0 z-10'
-              : 'opacity-0 translate-x-12 z-0 pointer-events-none'
-          "
-        >
-          <!-- Background Image -->
+        <transition :name="slideDirection">
           <div
-            v-if="item.image"
-            class="absolute inset-0 w-full h-full z-0 cursor-pointer overflow-hidden"
-            @click="openModal(item.raw)"
+            v-if="activeHeadline"
+            :key="activeHeadline.id"
+            class="absolute inset-0 w-full h-full flex"
           >
-            <img
-              :src="item.image"
-              class="w-full h-full object-cover opacity-40 mix-blend-overlay transition-transform duration-1000 group-hover:scale-105"
-              alt="Media Headline"
-            />
-            <!-- Added overlay for better text readability as requested -->
-            <div class="absolute inset-0 bg-black/50"></div>
+            <!-- Background Image -->
             <div
-              class="absolute inset-0 bg-gradient-to-t from-[#0c0a09] via-[#0c0a09]/80 to-transparent pointer-events-none"
-            ></div>
-          </div>
-
-          <!-- Content -->
-          <div
-            class="relative z-20 p-8 md:p-12 lg:p-16 flex flex-col justify-end h-full w-full max-w-4xl"
-          >
-            <h2
-              class="font-serif text-3xl md:text-5xl leading-[1.1] mb-4 text-white drop-shadow-lg line-clamp-2 hover:text-gray-300 cursor-pointer transition-colors"
-              @click="openModal(item.raw)"
+              v-if="activeHeadline.image"
+              class="absolute inset-0 w-full h-full z-0 cursor-pointer overflow-hidden"
+              @click="openModal(activeHeadline.raw)"
             >
-              {{ item.title }}
-            </h2>
-
-            <div
-              v-if="item.type === 'jadwal'"
-              class="text-[14px] md:text-[16px] text-gray-300 mb-6 flex flex-wrap items-center gap-2 md:gap-3"
-            >
-              <span class="flex items-center gap-1.5">
-                <svg
-                  class="w-4 h-4 md:w-5 md:h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  ></path>
-                </svg>
-                {{ formatDate(item.date) }}
-              </span>
-              <span class="hidden md:inline">&bull;</span>
-              <span>{{ formatWaktu(item.time) }} WIB</span>
-              <span class="hidden md:inline">&bull;</span>
-              <span class="truncate max-w-[200px] md:max-w-none">{{ item.location }}</span>
-            </div>
-            <div
-              v-else
-              class="text-[14px] md:text-[16px] text-gray-300 mb-6 flex items-center gap-2 md:gap-3"
-            >
-              <span class="flex items-center gap-1.5">
-                <svg
-                  class="w-4 h-4 md:w-5 md:h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  ></path>
-                </svg>
-                {{ formatDate(item.date) }}
-              </span>
+              <img
+                :src="activeHeadline.image"
+                class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                alt="Media Headline"
+              />
+              <div
+                class="absolute inset-x-0 bottom-0 h-[95%] bg-gradient-to-t from-[#0c0a09] via-[#0c0a09]/85 to-transparent pointer-events-none"
+              ></div>
             </div>
 
-            <p
-              class="text-[14px] md:text-[16px] text-gray-400 line-clamp-3 md:line-clamp-4 max-w-3xl mb-8"
+            <!-- Content -->
+            <div
+              class="relative z-20 p-6 sm:p-8 md:p-12 lg:p-16 pb-12 sm:pb-16 md:pb-20 lg:pb-20 flex flex-col justify-end h-full w-full max-w-4xl"
             >
-              {{ item.desc }}
-            </p>
-
-            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6 mt-6">
-              <button @click="openModal(item.raw)" class="selengkapnya-link white text-[14px]">
-                Baca Selengkapnya
-              </button>
-              <a
-                v-if="item.link"
-                :href="item.link"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="tautan-button white-mode w-full sm:w-auto justify-center"
-                style="--clr: #ffffff"
+              <h2
+                class="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl leading-[1.15] sm:leading-[1.1] mb-2 sm:mb-4 text-white drop-shadow-lg line-clamp-2 hover:text-gray-300 cursor-pointer transition-colors"
+                @click="openModal(activeHeadline.raw)"
               >
-                <span>Buka Tautan</span>
-                <span class="tautan-button__icon-wrapper">
+                {{ activeHeadline.title }}
+              </h2>
+
+              <div
+                v-if="activeHeadline.type === 'jadwal'"
+                class="text-[12px] sm:text-[14px] md:text-[16px] text-gray-300 mb-3 sm:mb-6 flex flex-wrap items-center gap-1.5 sm:gap-2 md:gap-3"
+              >
+                <span class="flex items-center gap-1.5">
                   <svg
-                    viewBox="0 0 14 15"
+                    class="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5"
                     fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="tautan-button__icon-svg"
-                    width="10"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
                     <path
-                      d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.28-9.224-.048 6.912 2.456.024z"
-                      fill="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                     ></path>
                   </svg>
-                  <svg
-                    viewBox="0 0 14 15"
-                    fill="none"
-                    width="10"
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="tautan-button__icon-svg tautan-button__icon-svg--copy"
-                  >
-                    <path
-                      d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.28-9.224-.048 6.912 2.456.024z"
-                      fill="currentColor"
-                    ></path>
-                  </svg>
+                  {{ formatDate(activeHeadline.date) }}
                 </span>
-              </a>
+                <span class="hidden md:inline">&bull;</span>
+                <span>{{ formatWaktu(activeHeadline.time) }} WIB</span>
+                <span class="hidden md:inline">&bull;</span>
+                <span class="truncate max-w-[200px] md:max-w-none">{{
+                  activeHeadline.location
+                }}</span>
+              </div>
+              <div
+                v-else
+                class="text-[12px] sm:text-[14px] md:text-[16px] text-gray-300 mb-3 sm:mb-6 flex items-center gap-1.5 sm:gap-2 md:gap-3"
+              >
+                <span class="flex items-center gap-1.5">
+                  <svg
+                    class="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    ></path>
+                  </svg>
+                  {{ formatDate(activeHeadline.date) }}
+                </span>
+              </div>
+
+              <p
+                class="text-[13px] sm:text-[14px] md:text-[16px] text-gray-300 sm:text-gray-400 line-clamp-2 sm:line-clamp-3 md:line-clamp-4 max-w-3xl mb-5 sm:mb-8"
+              >
+                {{ activeHeadline.desc }}
+              </p>
+
+              <div
+                class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 mt-1 sm:mt-6"
+              >
+                <button
+                  @click="openModal(activeHeadline.raw)"
+                  class="selengkapnya-link white text-[13px] sm:text-[14px]"
+                >
+                  Baca Selengkapnya
+                </button>
+                <a
+                  v-if="activeHeadline.link"
+                  :href="activeHeadline.link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="tautan-button white-mode w-full sm:w-auto justify-center"
+                  style="--clr: #ffffff"
+                >
+                  <span>Buka Tautan</span>
+                  <span class="tautan-button__icon-wrapper">
+                    <svg
+                      viewBox="0 0 14 15"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="tautan-button__icon-svg"
+                      width="10"
+                    >
+                      <path
+                        d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.28-9.224-.048 6.912 2.456.024z"
+                        fill="currentColor"
+                      ></path>
+                    </svg>
+                    <svg
+                      viewBox="0 0 14 15"
+                      fill="none"
+                      width="10"
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="tautan-button__icon-svg tautan-button__icon-svg--copy"
+                    >
+                      <path
+                        d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.28-9.224-.048 6.912 2.456.024z"
+                        fill="currentColor"
+                      ></path>
+                    </svg>
+                  </span>
+                </a>
+              </div>
             </div>
           </div>
-        </div>
+        </transition>
 
         <!-- Controls (Prev/Next) -->
         <button
           v-if="combinedHeadlines.length > 1"
           @click="prevSlide"
-          class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 border border-white/20 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-30 hover:bg-black/80 hover:scale-110"
+          class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 border border-white/20 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-30 hover:bg-white hover:text-black hover:scale-110"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -178,7 +182,7 @@
         <button
           v-if="combinedHeadlines.length > 1"
           @click="nextSlide"
-          class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 border border-white/20 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-30 hover:bg-black/80 hover:scale-110"
+          class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 border border-white/20 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-30 hover:bg-white hover:text-black hover:scale-110"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -193,16 +197,14 @@
         <!-- Slide Indicators -->
         <div
           v-if="combinedHeadlines.length > 1"
-          class="absolute bottom-6 left-0 right-0 flex justify-center gap-2 z-20"
+          class="absolute bottom-5 sm:bottom-8 left-0 right-0 flex justify-center gap-2 z-20"
         >
           <button
             v-for="(_, index) in combinedHeadlines"
             :key="index"
-            @click="currentSlide = index"
+            @click="goToSlide(index)"
             class="h-1.5 rounded-full transition-all duration-500 ease-out"
-            :class="
-              currentSlide === index ? 'bg-[#a7e5d3] w-8' : 'bg-white/40 w-2 hover:bg-white/60'
-            "
+            :class="currentSlide === index ? 'bg-white w-8' : 'bg-white/40 w-2 hover:bg-white'"
           ></button>
         </div>
       </div>
@@ -976,11 +978,22 @@ const combinedHeadlines = computed(() => {
 })
 
 const currentSlide = ref(0)
+const slideDirection = ref('slide-next')
 let slideInterval
+
+const activeHeadline = computed(() => {
+  if (combinedHeadlines.value.length === 0) return null
+  // Pengamanan misal index slide terlalu besar (karena data update tiba-tiba)
+  if (currentSlide.value >= combinedHeadlines.value.length) {
+    currentSlide.value = 0
+  }
+  return combinedHeadlines.value[currentSlide.value]
+})
 
 const startSlide = () => {
   slideInterval = setInterval(() => {
     if (combinedHeadlines.value.length > 1) {
+      slideDirection.value = 'slide-next'
       currentSlide.value = (currentSlide.value + 1) % combinedHeadlines.value.length
     }
   }, 5000) // 5 Detik per slide
@@ -988,11 +1001,44 @@ const startSlide = () => {
 const stopSlide = () => {
   clearInterval(slideInterval)
 }
-const nextSlide = () =>
-  (currentSlide.value = (currentSlide.value + 1) % combinedHeadlines.value.length)
-const prevSlide = () =>
-  (currentSlide.value =
-    (currentSlide.value - 1 + combinedHeadlines.value.length) % combinedHeadlines.value.length)
+const nextSlide = () => {
+  slideDirection.value = 'slide-next'
+  currentSlide.value = (currentSlide.value + 1) % combinedHeadlines.value.length
+}
+const prevSlide = () => {
+  slideDirection.value = 'slide-prev'(
+    (currentSlide.value =
+      (currentSlide.value - 1 + combinedHeadlines.value.length) % combinedHeadlines.value.length),
+  )
+}
+
+const goToSlide = (index) => {
+  if (index === currentSlide.value) return
+  slideDirection.value = index > currentSlide.value ? 'slide-next' : 'slide-prev'
+  currentSlide.value = index
+}
+
+// --- Swipe Gestures Logic ---
+let touchStartX = 0
+let touchEndX = 0
+
+const handleTouchStart = (e) => {
+  touchStartX = e.changedTouches[0].screenX
+}
+
+const handleTouchEnd = (e) => {
+  touchEndX = e.changedTouches[0].screenX
+  handleSwipe()
+}
+
+const handleSwipe = () => {
+  const swipeThreshold = 50 // Jarak minimal usapan agar terdeteksi
+  if (touchEndX < touchStartX - swipeThreshold) {
+    nextSlide() // Swipe ke kiri (slide berikutnya)
+  } else if (touchEndX > touchStartX + swipeThreshold) {
+    prevSlide() // Swipe ke kanan (slide sebelumnya)
+  }
+}
 
 onMounted(() => startSlide())
 onUnmounted(() => stopSlide())
@@ -1019,6 +1065,34 @@ const pastRenungan = computed(() => {
 <style>
 html {
   scroll-behavior: smooth;
+}
+
+/* Transisi Slider (Slide Next & Slide Prev) */
+.slide-next-enter-active,
+.slide-next-leave-active,
+.slide-prev-enter-active,
+.slide-prev-leave-active {
+  transition:
+    transform 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.8s ease-in-out;
+}
+
+.slide-next-enter-from {
+  transform: translateX(100%);
+  opacity: 0;
+}
+.slide-next-leave-to {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.slide-prev-enter-from {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+.slide-prev-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
 }
 </style>
 
@@ -1071,17 +1145,25 @@ html {
   border: none;
   cursor: pointer;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   background-color: var(--clr);
   color: #fff;
   border-radius: 10rem;
   font-weight: 700;
-  padding: 0.75rem 1.5rem;
+  padding: 0.6rem 1.25rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   transition: background-color 0.3s;
-  font-size: 14px;
+  font-size: 13px;
+}
+
+@media (min-width: 640px) {
+  .tautan-button {
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 14px;
+  }
 }
 
 .tautan-button.white-mode {
@@ -1099,8 +1181,8 @@ html {
 
 .tautan-button__icon-wrapper {
   flex-shrink: 0;
-  width: 25px;
-  height: 25px;
+  width: 22px;
+  height: 22px;
   position: relative;
   color: var(--clr);
   background-color: #fff;
@@ -1108,6 +1190,13 @@ html {
   display: grid;
   place-items: center;
   overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .tautan-button__icon-wrapper {
+    width: 25px;
+    height: 25px;
+  }
 }
 
 .tautan-button:hover {

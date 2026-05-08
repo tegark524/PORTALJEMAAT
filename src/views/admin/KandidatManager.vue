@@ -22,129 +22,132 @@
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="item in store.kandidat"
-              :key="item.id"
-              class="hover:bg-[#fafafa] transition-colors group"
-            >
-              <td class="p-4 border-b border-[#e7e5e4] align-middle text-center">
-                <div
-                  class="w-12 h-12 rounded-full bg-[#f0efed] border border-[#d6d3d1] mx-auto overflow-hidden shrink-0 flex items-center justify-center"
-                >
-                  <img
-                    v-if="item.url_foto || item.foto"
-                    :src="item.url_foto || item.foto"
-                    class="w-full h-full object-cover"
-                  />
-                  <svg
-                    v-else
-                    class="w-6 h-6 text-[#a8a29e]"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
+            <template v-if="store.isLoading && store.kandidat.length === 0">
+              <tr v-for="i in 3" :key="'skel-' + i" class="animate-pulse border-b border-[#e7e5e4]">
+                <td class="p-4 text-center">
+                  <div class="h-12 w-12 bg-[#e7e5e4] rounded-full mx-auto"></div>
+                </td>
+                <td class="p-4"><div class="h-4 bg-[#e7e5e4] rounded w-32"></div></td>
+                <td class="p-4">
+                  <div class="h-4 bg-[#e7e5e4] rounded w-full max-w-md mb-2"></div>
+                  <div class="h-4 bg-[#e7e5e4] rounded w-3/4 max-w-md"></div>
+                </td>
+                <td class="p-4"><div class="h-8 bg-[#e7e5e4] rounded w-16 mx-auto"></div></td>
+              </tr>
+            </template>
+            <template v-else>
+              <tr
+                v-for="item in store.kandidat"
+                :key="item.id"
+                class="hover:bg-[#fafafa] transition-colors group"
+              >
+                <td class="p-4 border-b border-[#e7e5e4] align-middle text-center">
+                  <div
+                    class="w-12 h-12 rounded-full bg-[#f0efed] border border-[#d6d3d1] mx-auto overflow-hidden shrink-0 flex items-center justify-center"
                   >
-                    <path
-                      d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z"
+                    <img
+                      v-if="item.url_foto || item.foto"
+                      :src="item.url_foto || item.foto"
+                      class="w-full h-full object-cover"
                     />
-                  </svg>
-                </div>
-              </td>
-              <td class="p-4 border-b border-[#e7e5e4] align-middle font-bold text-[#0c0a09]">
-                {{ item.nama }}
-              </td>
-              <td class="p-4 border-b border-[#e7e5e4] align-middle text-[13px] text-[#4e4e4e]">
-                <div class="line-clamp-2" :title="item.visi_misi">{{ item.visi_misi }}</div>
-              </td>
-              <td class="p-4 border-b border-[#e7e5e4] align-middle whitespace-nowrap">
-                <div class="flex justify-center gap-2">
-                  <button
-                    @click="openModal(item)"
-                    class="p-2 bg-[#f0efed] text-[#4e4e4e] hover:bg-[#e7e5e4] hover:text-[#800000] rounded-md transition-colors"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                      ></path>
-                    </svg>
-                  </button>
-                  <button
-                    @click="handleDelete(item.id)"
-                    class="bin-button"
-                    title="Hapus Data"
-                    :disabled="isDeleting === item.id"
-                  >
-                    <div
-                      v-if="isDeleting === item.id"
-                      class="flex flex-row gap-0.5 justify-center items-center w-full h-full"
+                    <svg
+                      v-else
+                      class="w-6 h-6 text-[#a8a29e]"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
                     >
-                      <div class="w-1.5 h-1.5 rounded-full bg-white animate-bounce"></div>
-                      <div
-                        class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-.3s]"
-                      ></div>
-                      <div
-                        class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-.5s]"
-                      ></div>
-                    </div>
-                    <template v-else>
-                      <svg
-                        class="bin-top"
-                        viewBox="0 0 39 7"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <line y1="5" x2="39" y2="5" stroke="white" stroke-width="4"></line>
-                        <line
-                          x1="12"
-                          y1="1.5"
-                          x2="26.0357"
-                          y2="1.5"
-                          stroke="white"
-                          stroke-width="3"
-                        ></line>
-                      </svg>
-                      <svg
-                        class="bin-bottom"
-                        viewBox="0 0 33 39"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <mask id="path-1-inside-1_8_19" fill="white">
-                          <path
-                            d="M0 0H33V35C33 37.2091 31.2091 39 29 39H4C1.79086 39 0 37.2091 0 35V0Z"
-                          ></path>
-                        </mask>
-                        <path
-                          d="M0 0H33H0ZM37 35C37 39.4183 33.4183 43 29 43H4C-0.418278 43 -4 39.4183 -4 35H4H29H37ZM4 43C-0.418278 43 -4 39.4183 -4 35V0H4V35V43ZM37 0V35C37 39.4183 33.4183 43 29 43V35V0H37Z"
-                          fill="white"
-                          mask="url(#path-1-inside-1_8_19)"
-                        ></path>
-                        <path d="M12 6L12 29" stroke="white" stroke-width="4"></path>
-                        <path d="M21 6V29" stroke="white" stroke-width="4"></path>
-                      </svg>
-                    </template>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr v-if="!store.kandidat.length">
-              <td colspan="4" class="p-8 text-center text-[#777169]">
-                <div v-if="store.isLoading" class="flex flex-col items-center justify-center gap-3">
-                  <div class="flex flex-row gap-2">
-                    <div class="w-3 h-3 rounded-full bg-[#800000] animate-bounce"></div>
-                    <div
-                      class="w-3 h-3 rounded-full bg-[#800000] animate-bounce [animation-delay:-.3s]"
-                    ></div>
-                    <div
-                      class="w-3 h-3 rounded-full bg-[#800000] animate-bounce [animation-delay:-.5s]"
-                    ></div>
+                      <path
+                        d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z"
+                      />
+                    </svg>
                   </div>
-                  <span class="text-[14px]">Memuat data kandidat...</span>
-                </div>
-                <span v-else>Data kandidat belum ditambahkan.</span>
-              </td>
-            </tr>
+                </td>
+                <td class="p-4 border-b border-[#e7e5e4] align-middle font-bold text-[#0c0a09]">
+                  {{ item.nama }}
+                </td>
+                <td class="p-4 border-b border-[#e7e5e4] align-middle text-[13px] text-[#4e4e4e]">
+                  <div class="line-clamp-2" :title="item.visi_misi">{{ item.visi_misi }}</div>
+                </td>
+                <td class="p-4 border-b border-[#e7e5e4] align-middle whitespace-nowrap">
+                  <div class="flex justify-center gap-2">
+                    <button
+                      @click="openModal(item)"
+                      class="p-2 bg-[#f0efed] text-[#4e4e4e] hover:bg-[#e7e5e4] hover:text-[#800000] rounded-md transition-colors"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                        ></path>
+                      </svg>
+                    </button>
+                    <button
+                      @click="handleDelete(item.id)"
+                      class="bin-button"
+                      title="Hapus Data"
+                      :disabled="isDeleting === item.id"
+                    >
+                      <div
+                        v-if="isDeleting === item.id"
+                        class="flex flex-row gap-0.5 justify-center items-center w-full h-full"
+                      >
+                        <div class="w-1.5 h-1.5 rounded-full bg-white animate-bounce"></div>
+                        <div
+                          class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-.3s]"
+                        ></div>
+                        <div
+                          class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-.5s]"
+                        ></div>
+                      </div>
+                      <template v-else>
+                        <svg
+                          class="bin-top"
+                          viewBox="0 0 39 7"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <line y1="5" x2="39" y2="5" stroke="white" stroke-width="4"></line>
+                          <line
+                            x1="12"
+                            y1="1.5"
+                            x2="26.0357"
+                            y2="1.5"
+                            stroke="white"
+                            stroke-width="3"
+                          ></line>
+                        </svg>
+                        <svg
+                          class="bin-bottom"
+                          viewBox="0 0 33 39"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <mask id="path-1-inside-1_8_19" fill="white">
+                            <path
+                              d="M0 0H33V35C33 37.2091 31.2091 39 29 39H4C1.79086 39 0 37.2091 0 35V0Z"
+                            ></path>
+                          </mask>
+                          <path
+                            d="M0 0H33H0ZM37 35C37 39.4183 33.4183 43 29 43H4C-0.418278 43 -4 39.4183 -4 35H4H29H37ZM4 43C-0.418278 43 -4 39.4183 -4 35V0H4V35V43ZM37 0V35C37 39.4183 33.4183 43 29 43V35V0H37Z"
+                            fill="white"
+                            mask="url(#path-1-inside-1_8_19)"
+                          ></path>
+                          <path d="M12 6L12 29" stroke="white" stroke-width="4"></path>
+                          <path d="M21 6V29" stroke="white" stroke-width="4"></path>
+                        </svg>
+                      </template>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="!store.kandidat.length">
+                <td colspan="4" class="p-8 text-center text-[#777169]">
+                  <span>Data kandidat belum ditambahkan.</span>
+                </td>
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>
