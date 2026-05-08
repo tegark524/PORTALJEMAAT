@@ -27,11 +27,7 @@
           <span class="ml-2 text-[#4e4e4e] font-medium text-[14px]">Memverifikasi akses...</span>
         </div>
         <div v-show="!isLoading">
-          <GoogleLogin
-            :callback="handleGoogleCallback"
-            popup-type="TOKEN"
-            scope="email profile openid"
-          >
+          <GoogleLogin :callback="handleGoogleCallback">
             <button class="button" type="button">
               <svg class="svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
