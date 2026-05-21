@@ -58,6 +58,12 @@ const router = createRouter({
       meta: { title: 'Layanan Doa' },
     },
     {
+      path: '/renungan',
+      name: 'renungan',
+      component: () => import('@/views/public/RenunganView.vue'),
+      meta: { title: 'Renungan Harian' },
+    },
+    {
       path: '/tentang',
       name: 'tentang',
       component: () => import('@/views/public/TentangView.vue'),

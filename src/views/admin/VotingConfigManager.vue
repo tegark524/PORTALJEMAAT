@@ -80,10 +80,102 @@
         </p>
       </div>
 
+      <!-- Card 3: Tahapan Voting -->
+      <div class="bg-white p-6 md:p-8 rounded-[16px] border border-[#e7e5e4] shadow-sm">
+        <h3 class="text-[18px] font-bold text-[#0c0a09] mb-6 border-b border-[#e7e5e4] pb-4">
+          3. Pengaturan Tahapan Voting
+        </h3>
+        <div class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-[13px] font-semibold text-[#4e4e4e] mb-1"
+                >Jumlah Tahapan</label
+              >
+              <input
+                v-model.number="form.stage_count"
+                type="number"
+                min="2"
+                required
+                class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2.5 text-[14px] focus:outline-none focus:border-[#800000] focus:ring-1 focus:ring-[#800000]"
+              />
+            </div>
+            <div>
+              <label class="block text-[13px] font-semibold text-[#4e4e4e] mb-1"
+                >Label Tahap 2</label
+              >
+              <input
+                v-model="form.stage2_label"
+                type="text"
+                placeholder="Contoh: Tahap 2 - Final"
+                class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2.5 text-[14px] focus:outline-none focus:border-[#800000] focus:ring-1 focus:ring-[#800000]"
+              />
+            </div>
+          </div>
+
+          <div class="bg-[#f8fafc] p-4 rounded-xl border border-[#e7e5e4]">
+            <h4 class="text-[15px] font-bold text-[#0c0a09] mb-3">Tahap 1 - Kebutuhan Kolom</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-[13px] font-semibold text-[#4e4e4e] mb-1"
+                  >Label Tahap 1</label
+                >
+                <input
+                  v-model="form.stage1_label"
+                  type="text"
+                  placeholder="Contoh: Tahap 1 - Wilayah"
+                  class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2.5 text-[14px] focus:outline-none focus:border-[#800000] focus:ring-1 focus:ring-[#800000]"
+                />
+              </div>
+              <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h5 class="text-[13px] font-semibold text-[#4e4e4e]">Gunakan Kolom Wilayah</h5>
+                    <p class="text-[12px] text-[#777169]">
+                      Nyalakan agar tahap 1 menerima Wilayah 1/2.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    @click="form.stage1_require_region = !form.stage1_require_region"
+                    class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+                    :class="form.stage1_require_region ? 'bg-[#166534]' : 'bg-[#d6d3d1]'"
+                  >
+                    <span
+                      class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                      :class="form.stage1_require_region ? 'translate-x-5' : 'translate-x-0'"
+                    ></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+              <div>
+                <label class="block text-[13px] font-semibold text-[#4e4e4e] mb-1">Wilayah 1</label>
+                <input
+                  v-model="form.stage1_region_1"
+                  type="text"
+                  placeholder="Contoh: Wilayah 1"
+                  class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2.5 text-[14px] focus:outline-none focus:border-[#800000] focus:ring-1 focus:ring-[#800000]"
+                />
+              </div>
+              <div>
+                <label class="block text-[13px] font-semibold text-[#4e4e4e] mb-1">Wilayah 2</label>
+                <input
+                  v-model="form.stage1_region_2"
+                  type="text"
+                  placeholder="Contoh: Wilayah 2"
+                  class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2.5 text-[14px] focus:outline-none focus:border-[#800000] focus:ring-1 focus:ring-[#800000]"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Card 3: Visibilitas & Publikasi -->
       <div class="bg-white p-6 md:p-8 rounded-[16px] border border-[#e7e5e4] shadow-sm">
         <h3 class="text-[18px] font-bold text-[#0c0a09] mb-6 border-b border-[#e7e5e4] pb-4">
-          3. Pengaturan Tampilan Jemaat (Beranda Publik)
+          4. Pengaturan Tampilan Jemaat (Beranda Publik)
         </h3>
         <div class="space-y-6">
           <!-- Switch Aktifkan Portal -->
@@ -195,6 +287,13 @@ const form = ref({
   waktu_mulai: '',
   waktu_selesai: '',
   is_result_published: false,
+  stage_count: 2,
+  stage1_label: 'Tahap 1 - Wilayah',
+  stage1_require_age: false,
+  stage1_require_region: true,
+  stage1_region_1: '',
+  stage1_region_2: '',
+  stage2_label: 'Tahap 2 - Final',
 })
 
 const toast = ref({ show: false, message: '', type: 'success' })
@@ -213,6 +312,12 @@ const formatToDateTimeLocal = (dateStr) => {
   return d.toISOString().slice(0, 16)
 }
 
+const parseBool = (value, fallback = false) => {
+  if (value === true || value === 'TRUE' || String(value).toLowerCase() === 'true') return true
+  if (value === false || value === 'FALSE' || String(value).toLowerCase() === 'false') return false
+  return fallback
+}
+
 const loadData = async () => {
   await store.fetchVotingConfig()
   const cfg = store.votingConfig
@@ -222,13 +327,18 @@ const loadData = async () => {
     form.value.judul_pemilihan = cfg.judul_pemilihan || cfg.nama_event || ''
     form.value.deskripsi = cfg.deskripsi || cfg.deskripsi_event || ''
     const activeVal = cfg.is_active
-    form.value.is_active =
-      activeVal === true || activeVal === 'TRUE' || String(activeVal).toLowerCase() === 'true'
+    form.value.is_active = parseBool(activeVal, false)
     form.value.waktu_mulai = formatToDateTimeLocal(cfg.waktu_mulai)
     form.value.waktu_selesai = formatToDateTimeLocal(cfg.waktu_selesai)
     const pubVal = cfg.is_result_published
-    form.value.is_result_published =
-      pubVal === true || pubVal === 'TRUE' || String(pubVal).toLowerCase() === 'true'
+    form.value.is_result_published = parseBool(pubVal, false)
+    form.value.stage_count = Number(cfg.stage_count) || 2
+    form.value.stage1_label = cfg.stage1_label || 'Tahap 1 - Wilayah'
+    form.value.stage1_require_age = false
+    form.value.stage1_require_region = parseBool(cfg.stage1_require_region, true)
+    form.value.stage1_region_1 = cfg.stage1_region_1 || ''
+    form.value.stage1_region_2 = cfg.stage1_region_2 || ''
+    form.value.stage2_label = cfg.stage2_label || 'Tahap 2 - Final'
   }
 }
 
@@ -239,7 +349,7 @@ onMounted(() => {
 const handleSave = async () => {
   isSubmitting.value = true
   try {
-    // Array Payload harus sesuai dengan urutan Kolom di Spreadsheet (A - G)
+    // Array Payload harus sesuai dengan urutan Kolom di Spreadsheet (A - J)
     const payloadData = [
       form.value.id,
       form.value.judul_pemilihan,
@@ -248,6 +358,13 @@ const handleSave = async () => {
       form.value.waktu_mulai ? new Date(form.value.waktu_mulai).toISOString() : '',
       form.value.waktu_selesai ? new Date(form.value.waktu_selesai).toISOString() : '',
       form.value.is_result_published,
+      form.value.stage_count,
+      form.value.stage1_label,
+      form.value.stage1_require_age,
+      form.value.stage1_require_region,
+      form.value.stage1_region_1,
+      form.value.stage1_region_2,
+      form.value.stage2_label,
     ]
     await store.submitGasAction(
       isEditing.value ? 'update' : 'insert',

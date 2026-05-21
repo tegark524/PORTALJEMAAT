@@ -18,6 +18,7 @@
               <th class="p-4 border-b border-[#e7e5e4] w-20 text-center">Foto</th>
               <th class="p-4 border-b border-[#e7e5e4] w-48">Nama Kandidat</th>
               <th class="p-4 border-b border-[#e7e5e4] min-w-[200px]">Visi & Misi</th>
+              <th class="p-4 border-b border-[#e7e5e4] w-24 text-center">Wilayah</th>
               <th class="p-4 border-b border-[#e7e5e4] w-24 text-center whitespace-nowrap">Aksi</th>
             </tr>
           </thead>
@@ -67,6 +68,11 @@
                 </td>
                 <td class="p-4 border-b border-[#e7e5e4] align-middle text-[13px] text-[#4e4e4e]">
                   <div class="line-clamp-2" :title="item.visi_misi">{{ item.visi_misi }}</div>
+                </td>
+                <td
+                  class="p-4 border-b border-[#e7e5e4] align-middle text-center text-[13px] text-[#4e4e4e]"
+                >
+                  {{ item.region || item.wilayah || '-' }}
                 </td>
                 <td class="p-4 border-b border-[#e7e5e4] align-middle whitespace-nowrap">
                   <div class="flex justify-center gap-2">
@@ -186,6 +192,19 @@
           </div>
           <div>
             <label class="block text-[13px] font-semibold text-[#4e4e4e] mb-1"
+              >Wilayah Kandidat</label
+            >
+            <select
+              v-model="form.region"
+              required
+              class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2 text-[14px] focus:outline-none focus:border-[#800000] focus:ring-1 focus:ring-[#800000]"
+            >
+              <option value="Wilayah 1">Wilayah 1</option>
+              <option value="Wilayah 2">Wilayah 2</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[13px] font-semibold text-[#4e4e4e] mb-1"
               >Upload Foto (Opsional)</label
             >
             <input
@@ -280,7 +299,7 @@ const isSubmitting = ref(false)
 const isUploading = ref(false)
 const isDeleting = ref(null)
 
-const form = ref({ id: '', nama: '', visi_misi: '', url_foto: '' })
+const form = ref({ id: '', nama: '', visi_misi: '', region: 'Wilayah 1', url_foto: '' })
 const toast = ref({ show: false, message: '', type: 'success' })
 const showToast = (msg, type = 'success') => {
   toast.value = { show: true, message: msg, type }
@@ -327,10 +346,14 @@ watch(
 const openModal = (item = null) => {
   if (item) {
     isEdit.value = true
-    form.value = { ...item, url_foto: item.url_foto || item.foto || '' }
+    form.value = {
+      ...item,
+      url_foto: item.url_foto || item.foto || '',
+      region: item.region || item.wilayah || 'Wilayah 1',
+    }
   } else {
     isEdit.value = false
-    form.value = { id: '', nama: '', visi_misi: '', url_foto: '' }
+    form.value = { id: '', nama: '', visi_misi: '', region: 'Wilayah 1', url_foto: '' }
     isUploading.value = false
   }
   showModal.value = true
@@ -365,7 +388,13 @@ const handleSave = async () => {
   isSubmitting.value = true
   try {
     const rowId = isEdit.value ? form.value.id : `KND-${Date.now()}`
-    const payload = [rowId, form.value.nama, form.value.visi_misi, form.value.url_foto]
+    const payload = [
+      rowId,
+      form.value.nama,
+      form.value.visi_misi,
+      form.value.url_foto,
+      form.value.region,
+    ]
     await store.submitGasAction(isEdit.value ? 'update' : 'insert', 'tb_kandidat', payload, rowId)
     await store.fetchKandidat()
     showToast(`Berhasil disave.`)

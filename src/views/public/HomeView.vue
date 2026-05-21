@@ -261,8 +261,16 @@
             >
               {{ latestRenungan.judul || latestRenungan.tema || latestRenungan.title }}
             </h3>
-            <p v-if="latestRenungan.nats" class="text-[15px] text-[#800000] italic mb-4">
-              {{ latestRenungan.nats }}
+            <p
+              v-if="latestRenungan.nats || latestRenungan.bible_book_name"
+              class="text-[15px] text-[#800000] italic mb-4"
+            >
+              {{
+                latestRenungan.nats ||
+                (latestRenungan.bible_book_name
+                  ? `${latestRenungan.bible_book_name} ${latestRenungan.bible_chapter}${latestRenungan.bible_range || latestRenungan.bible_nats ? ':' + (latestRenungan.bible_range || latestRenungan.bible_nats) : ''}`
+                  : '')
+              }}
             </p>
             <p
               class="text-[16px] text-[#4e4e4e] font-normal leading-[1.6] line-clamp-3 mb-8 max-w-3xl"
@@ -299,10 +307,7 @@
         </div>
       </div>
       <div v-else-if="pastRenungan.length > 0">
-        <div
-          class="grid grid-cols-1 md:grid-cols-3 gap-6"
-          :class="!showAllRenungan ? 'hidden md:grid' : ''"
-        >
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div
             v-for="(renungan, index) in pastRenungan"
             :key="index"
@@ -317,8 +322,16 @@
             >
               {{ renungan.judul || renungan.tema || renungan.title }}
             </h4>
-            <p v-if="renungan.nats" class="text-[13px] text-[#800000] italic mb-3">
-              {{ renungan.nats }}
+            <p
+              v-if="renungan.nats || renungan.bible_book_name"
+              class="text-[13px] text-[#800000] italic mb-3"
+            >
+              {{
+                renungan.nats ||
+                (renungan.bible_book_name
+                  ? `${renungan.bible_book_name} ${renungan.bible_chapter}${renungan.bible_range || renungan.bible_nats ? ':' + (renungan.bible_range || renungan.bible_nats) : ''}`
+                  : '')
+              }}
             </p>
             <p
               class="text-[14px] text-[#4e4e4e] font-sans font-normal leading-[1.6] line-clamp-3 mb-4 flex-grow"
@@ -331,14 +344,14 @@
           </div>
         </div>
 
-        <!-- Tombol Selengkapnya (Hanya Mobile) -->
-        <div class="mt-8 flex justify-center md:hidden">
-          <button
-            @click="showAllRenungan = !showAllRenungan"
+        <!-- Tombol Lihat Semua Renungan -->
+        <div class="mt-8 flex justify-center">
+          <router-link
+            to="/renungan"
             class="bg-transparent border border-[#d6d3d1] text-[#0c0a09] px-6 py-2.5 rounded-full text-[13px] font-bold hover:bg-[#f0efed] transition-colors"
           >
-            {{ showAllRenungan ? 'Tutup Arsip' : 'Lihat Arsip Lainnya' }}
-          </button>
+            Lihat Semua Renungan
+          </router-link>
         </div>
       </div>
     </section>
@@ -470,10 +483,15 @@
                 }}
               </h2>
               <p
-                v-if="selectedItem?.nats"
+                v-if="selectedItem?.nats || selectedItem?.bible_book_name"
                 class="text-[#800000] italic text-[16px] mb-6 font-serif"
               >
-                {{ selectedItem.nats }}
+                {{
+                  selectedItem?.nats ||
+                  (selectedItem?.bible_book_name
+                    ? `${selectedItem?.bible_book_name} ${selectedItem?.bible_chapter}${selectedItem?.bible_range || selectedItem?.bible_nats ? ':' + (selectedItem?.bible_range || selectedItem?.bible_nats) : ''}`
+                    : '')
+                }}
               </p>
 
               <!-- Tambahan Informasi untuk Jadwal Ibadah -->
@@ -538,15 +556,75 @@
                 />
               </div>
 
-              <div class="text-[#4e4e4e] text-[16px] leading-[1.6] space-y-4 whitespace-pre-wrap">
-                {{
-                  selectedItem?.isi_renungan ||
-                  selectedItem?.isi ||
-                  selectedItem?.content ||
-                  selectedItem?.ringkasan ||
-                  selectedItem?.excerpt ||
-                  selectedItem?.keterangan
-                }}
+              <div class="space-y-4">
+                <div v-if="isBibleAvailable" class="mb-6">
+                  <div
+                    v-if="bibleLoading"
+                    class="text-[#4e4e4e] text-[16px] leading-relaxed font-serif"
+                  >
+                    Memuat bacaan Alkitab...
+                  </div>
+
+                  <div v-else>
+                    <div
+                      v-if="bibleError"
+                      class="text-[#dc2626] text-[15px] leading-relaxed font-medium"
+                    >
+                      {{ bibleError }}
+                    </div>
+
+                    <div
+                      v-else
+                      class="bg-[#fafafa] rounded-xl p-5 md:p-6 border border-[#e7e5e4] shadow-inner mb-6"
+                    >
+                      <div
+                        class="flex justify-between items-center border-b border-[#d6d3d1] pb-3 mb-4"
+                      >
+                        <h4 class="font-serif text-[18px] md:text-[20px] font-bold text-[#0c0a09]">
+                          {{ normalizedBible.bookName }} {{ normalizedBible.chapter
+                          }}{{ normalizedBible.range ? ':' + normalizedBible.range : '' }}
+                        </h4>
+                        <span
+                          class="text-[11px] md:text-[12px] font-bold text-[#777169] uppercase tracking-wider bg-[#e7e5e4] px-2.5 py-1 rounded-md"
+                          >TB</span
+                        >
+                      </div>
+                      <div
+                        class="space-y-1.5 md:space-y-2 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar"
+                      >
+                        <p
+                          v-for="verse in bibleVerses"
+                          :key="verse.a"
+                          class="text-[#3c3c3c] text-[16px] md:text-[17px] leading-relaxed font-serif"
+                        >
+                          <sup class="font-bold text-[#800000] mr-1">{{ verse.a }}</sup
+                          >{{ verse.t }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="text-[#4e4e4e] text-[16px] leading-[1.6] space-y-4 whitespace-pre-wrap"
+                  :class="isBibleAvailable ? 'mt-6 pt-6 border-t border-[#e7e5e4]' : ''"
+                >
+                  {{
+                    selectedItem?.isi_renungan ||
+                    selectedItem?.isi ||
+                    selectedItem?.content ||
+                    selectedItem?.ringkasan ||
+                    selectedItem?.excerpt ||
+                    selectedItem?.keterangan
+                  }}
+                </div>
+
+                <div
+                  v-if="selectedItem?.penulis"
+                  class="mt-6 pt-4 border-t border-[#e7e5e4] text-[#777169] text-[14px] font-medium italic"
+                >
+                  Penulis: {{ selectedItem.penulis }}
+                </div>
               </div>
 
               <!-- Tombol Buka Tautan -->
@@ -706,6 +784,7 @@
 </template>
 
 <script setup>
+import axios from 'axios'
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useChurchStore } from '@/stores/churchStore'
 import WartaList from '@/components/WartaList.vue'
@@ -748,9 +827,225 @@ const store = useChurchStore()
 const searchQuery = ref('')
 const isModalOpen = ref(false)
 const selectedItem = ref(null)
+const bibleVerses = ref([])
+const bibleLoading = ref(false)
+const bibleError = ref('')
+const showFullBible = ref(false)
 const showAllRenungan = ref(false)
 const showPrayerPopup = ref(false)
 let autoCloseTimer = null
+
+// Alat Pembaca Nats Otomatis
+const getBookFileName = (bookName) => {
+  let clean = String(bookName).toLowerCase().trim()
+  clean = clean.replace(/^(kitab|injil)\s+/i, '')
+  const mapping = {
+    kej: 'kejadian',
+    kel: 'keluaran',
+    im: 'imamat',
+    bil: 'bilangan',
+    ul: 'ulangan',
+    yos: 'yosua',
+    hak: 'hakim-hakim',
+    rut: 'rut',
+    '1 sam': '1_samuel',
+    '2 sam': '2_samuel',
+    '1 raj': '1_raja-raja',
+    '2 raj': '2_raja-raja',
+    '1 taw': '1_tawarikh',
+    '2 taw': '2_tawarikh',
+    ezr: 'ezra',
+    neh: 'nehemia',
+    est: 'ester',
+    ayb: 'ayub',
+    mzm: 'mazmur',
+    maz: 'mazmur',
+    ams: 'amsal',
+    pkh: 'pengkhotbah',
+    kid: 'kidung_agung',
+    yes: 'yesaya',
+    yer: 'yeremia',
+    rat: 'ratapan',
+    yeh: 'yehezkiel',
+    dan: 'daniel',
+    hos: 'hosea',
+    yoe: 'yoel',
+    am: 'amos',
+    ob: 'obaja',
+    yun: 'yunus',
+    mik: 'mikha',
+    nah: 'nahum',
+    hab: 'habakuk',
+    zef: 'zefanya',
+    hag: 'hagai',
+    zak: 'zakharia',
+    mal: 'maleakhi',
+    mat: 'matius',
+    mrk: 'markus',
+    mar: 'markus',
+    luk: 'lukas',
+    yoh: 'yohanes',
+    kis: 'kisah_para_rasul',
+    rom: 'roma',
+    '1 kor': '1_korintus',
+    '2 kor': '2_korintus',
+    gal: 'galatia',
+    efe: 'efesus',
+    fil: 'filipi',
+    kol: 'kolose',
+    '1 tes': '1_tesalonika',
+    '2 tes': '2_tesalonika',
+    '1 tim': '1_timotius',
+    '2 tim': '2_timotius',
+    tit: 'titus',
+    flm: 'filemon',
+    ibr: 'ibrani',
+    yak: 'yakobus',
+    '1 pet': '1_petrus',
+    '2 pet': '2_petrus',
+    '1 yoh': '1_yohanes',
+    '2 yoh': '2_yohanes',
+    '3 yoh': '3_yohanes',
+    yud: 'yudas',
+    wah: 'wahyu',
+  }
+  for (const [key, value] of Object.entries(mapping)) {
+    if (clean === key || clean.startsWith(key + ' ') || clean === value) return value + '.json'
+  }
+  return clean.replace(/\s+/g, '_') + '.json'
+}
+
+const parseNats = (natsString) => {
+  if (!natsString) return null
+  // Regex tahan banting: Mendukung angka, spasi, dan tanda hubung pada nama kitab (misal: 1 Raja-raja)
+  const regex = /^(\d?\s*[a-zA-Z\s\-]+?)\s*(\d+)\s*:\s*([\d\s,-]+)/
+  const match = String(natsString).trim().match(regex)
+  if (match) {
+    return {
+      bookName: match[1].trim(),
+      bookFile: getBookFileName(match[1]),
+      chapter: match[2].trim(),
+      range: match[3].trim(),
+    }
+  }
+  return null
+}
+
+const getBibleMetadata = (item) => {
+  if (!item)
+    return {
+      bookFile: '',
+      bookName: '',
+      chapter: '',
+      range: '',
+      bibleNats: '',
+      textNats: '',
+    }
+
+  // Coba ambil data langsung dari field-field yang tersedia
+  let bookFile =
+    item.bible_book_file ||
+    item.book_file ||
+    item.file ||
+    item.bookFile ||
+    item.bible_file ||
+    item.alkitab ||
+    ''
+  let bookName =
+    item.bible_book_name || item.book_name || item.book || item.bible_name || item.kitab || ''
+  let chapter = item.bible_chapter || item.chapter || item.pasal || item.p || ''
+  let range = item.bible_range || item.range || item.ayat || ''
+  let bibleNats = item.bible_nats || item.tentang || ''
+  const textNats = item.nats || ''
+
+  // Fallback: jika bookFile/chapter kosong, coba parse dari field nats (contoh: "Yohanes 3:16-17")
+  if (!bookFile && textNats) {
+    const parsed = parseNats(textNats)
+    if (parsed) {
+      bookFile = parsed.bookFile
+      bookName = bookName || parsed.bookName
+      chapter = chapter || parsed.chapter
+      range = range || parsed.range
+    }
+  }
+
+  return { bookFile, bookName, chapter, range, bibleNats, textNats }
+}
+
+const normalizedBible = computed(() => getBibleMetadata(selectedItem.value))
+
+const isBibleAvailable = computed(() => {
+  return (
+    normalizedBible.value.bookFile &&
+    normalizedBible.value.chapter &&
+    (normalizedBible.value.range || normalizedBible.value.bibleNats)
+  )
+})
+
+const parseBibleRange = (range, bibleNats) => {
+  if (!range || !String(range).trim()) {
+    const verseNum = Number(bibleNats)
+    if (Number.isInteger(verseNum) && verseNum > 0) {
+      return { start: verseNum, end: verseNum }
+    }
+    return { start: 1, end: 1 }
+  }
+  const parts = String(range)
+    .split('-')
+    .map((value) => Number(value.trim()))
+    .filter((value) => Number.isInteger(value) && value > 0)
+
+  if (!parts.length) {
+    const verseNum = Number(bibleNats)
+    return Number.isInteger(verseNum) && verseNum > 0
+      ? { start: verseNum, end: verseNum }
+      : { start: 1, end: 1 }
+  }
+  return {
+    start: parts[0],
+    end: parts[1] || parts[0],
+  }
+}
+
+const loadBibleVerses = async (item) => {
+  bibleVerses.value = []
+  bibleError.value = ''
+
+  const metadata = getBibleMetadata(item)
+  if (!metadata.bookFile || !metadata.chapter || (!metadata.range && !metadata.bibleNats)) return
+
+  bibleLoading.value = true
+  try {
+    const bibleUrl = `${import.meta.env.BASE_URL}alkitab/${metadata.bookFile}`
+    const response = await axios.get(bibleUrl)
+    const bibleData = response.data
+    const chapter = Number(metadata.chapter)
+    const { start, end } = parseBibleRange(metadata.range, metadata.bibleNats)
+
+    if (!Number.isInteger(chapter) || chapter < 1) {
+      bibleError.value = 'Data pasal Alkitab tidak valid.'
+      return
+    }
+
+    if (!Array.isArray(bibleData)) {
+      bibleError.value = 'Format teks Alkitab tidak dikenali.'
+      return
+    }
+
+    bibleVerses.value = bibleData.filter(
+      (verse) => Number(verse.p) === chapter && Number(verse.a) >= start && Number(verse.a) <= end,
+    )
+
+    if (!bibleVerses.value.length) {
+      bibleError.value = 'Ayat Alkitab tidak ditemukan untuk rentang tersebut.'
+    }
+  } catch (error) {
+    bibleError.value = 'Gagal memuat teks Alkitab. Silakan coba lagi.'
+    console.error('Bible load error:', error)
+  } finally {
+    bibleLoading.value = false
+  }
+}
 
 const closePrayerPopup = () => {
   showPrayerPopup.value = false
@@ -819,8 +1114,15 @@ const listWarta = computed(() => {
 // --- Modal Logic ---
 const openModal = (item) => {
   selectedItem.value = item
+  bibleVerses.value = []
+  bibleError.value = ''
+  showFullBible.value = false
   isModalOpen.value = true
   document.body.style.overflow = 'hidden' // Prevent scrolling behind modal
+
+  if (isBibleAvailable.value) {
+    loadBibleVerses(item)
+  }
 }
 
 const closeModal = () => {
@@ -841,9 +1143,14 @@ const shareContent = async (item) => {
   let shareText = `${url}\n`
 
   // 1. Format untuk Renungan
-  if (item.nats !== undefined) {
+  if (item.nats !== undefined || item.bible_book_name !== undefined) {
+    const natsText =
+      item.nats ||
+      (item.bible_book_name
+        ? `${item.bible_book_name} ${item.bible_chapter}${item.bible_range || item.bible_nats ? ':' + (item.bible_range || item.bible_nats) : ''}`
+        : '')
     shareText += `${formattedDate}\n\n`
-    shareText += `${item.nats}\n\n`
+    if (natsText) shareText += `${natsText}\n\n`
     shareText += `${item.isi_renungan || item.isi || item.content || ''}`
   }
   // 2. Format untuk Jadwal Ibadah
@@ -1006,10 +1313,9 @@ const nextSlide = () => {
   currentSlide.value = (currentSlide.value + 1) % combinedHeadlines.value.length
 }
 const prevSlide = () => {
-  slideDirection.value = 'slide-prev'(
-    (currentSlide.value =
-      (currentSlide.value - 1 + combinedHeadlines.value.length) % combinedHeadlines.value.length),
-  )
+  slideDirection.value = 'slide-prev'
+  currentSlide.value =
+    (currentSlide.value - 1 + combinedHeadlines.value.length) % combinedHeadlines.value.length
 }
 
 const goToSlide = (index) => {
@@ -1046,11 +1352,19 @@ onUnmounted(() => stopSlide())
 // --- Renungan Logic ---
 const sortedRenungan = computed(() => {
   if (!store.renungan.length) return []
-  return [...store.renungan].sort(
-    (a, b) =>
-      new Date(b.tanggal_tayang || b.date || b.tanggal) -
-      new Date(a.tanggal_tayang || a.date || a.tanggal),
-  )
+  const now = new Date()
+  now.setHours(23, 59, 59, 999) // Batas akhir hari ini
+
+  return [...store.renungan]
+    .filter((r) => {
+      const rDate = new Date(r.tanggal_tayang || r.date || r.tanggal)
+      return rDate <= now
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.tanggal_tayang || b.date || b.tanggal) -
+        new Date(a.tanggal_tayang || a.date || a.tanggal),
+    )
 })
 
 const latestRenungan = computed(() => {
@@ -1058,7 +1372,7 @@ const latestRenungan = computed(() => {
 })
 
 const pastRenungan = computed(() => {
-  return sortedRenungan.value.slice(1)
+  return sortedRenungan.value.slice(1, 4) // Tampilkan maksimal 3 renungan di grid bawah
 })
 </script>
 
@@ -1136,6 +1450,19 @@ html {
 
 .selengkapnya-link.white {
   --link-color: #ffffff;
+}
+
+/* Kustomisasi scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #d6d3d1;
+  border-radius: 4px;
 }
 
 .tautan-button {

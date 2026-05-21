@@ -85,7 +85,7 @@
               class="w-full bg-[#fcfcfc] border border-[#e7e5e4] rounded-lg px-4 py-3 text-[15px] font-sans focus:outline-none focus:border-[#800000] transition-colors cursor-pointer appearance-none"
             >
               <option value="Permohonan Doa">Permohonan Doa</option>
-              <option value="Konseling Pastoral">Konseling Pastoral</option>
+              <option value="Konseling">Konseling</option>
               <option value="Kunjungan Majelis">Kunjungan Majelis</option>
               <option value="Lainnya">Lainnya</option>
             </select>

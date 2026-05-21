@@ -354,43 +354,73 @@
         >
           Data kandidat belum ditambahkan oleh panitia.
         </div>
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div
-            v-for="kandidat in store.kandidat"
-            :key="kandidat.id"
-            class="bg-white rounded-[20px] p-6 border border-[#e7e5e4] shadow-sm hover:shadow-md transition-shadow group flex flex-col"
-          >
-            <div
-              class="w-24 h-24 rounded-full bg-[#f0efed] border-4 border-white shadow-sm overflow-hidden mb-4 shrink-0 mx-auto relative group-hover:scale-105 transition-transform duration-300"
-            >
-              <img
-                v-if="kandidat.url_foto || kandidat.foto"
-                :src="kandidat.url_foto || kandidat.foto"
-                :alt="kandidat.nama"
-                class="w-full h-full object-cover"
-              />
-              <div
-                v-else
-                class="w-full h-full flex items-center justify-center bg-[#f5f5f5] text-[#a8a29e]"
-              >
-                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-                  <path
-                    d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
-                </svg>
+        <div v-else class="space-y-10">
+          <div v-for="group in kandidatByRegion" :key="group.region" class="space-y-6">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 class="text-[22px] font-bold text-[#0c0a09]">{{ group.region }}</h3>
+                <p class="text-sm text-[#777169]">Daftar kandidat untuk {{ group.region }}.</p>
+              </div>
+              <div class="flex flex-wrap items-center gap-3">
+                <span
+                  class="inline-flex items-center rounded-full bg-[#f8fafc] text-[#166534] px-4 py-2 text-sm font-semibold border border-[#d1fae5]"
+                >
+                  {{ group.items.length }} Kandidat
+                </span>
+                <span
+                  v-if="group.items.length > 1"
+                  class="text-sm font-medium text-[#4b5563] sm:hidden"
+                >
+                  Selengkapnya
+                </span>
+                <span
+                  v-if="group.items.length > 3"
+                  class="hidden text-sm font-medium text-[#4b5563] sm:inline"
+                >
+                  Selengkapnya
+                </span>
               </div>
             </div>
-            <h3 class="text-[18px] font-bold text-[#0c0a09] text-center mb-4 leading-tight">
-              {{ kandidat.nama }}
-            </h3>
 
-            <div class="bg-[#faf7f2] rounded-xl p-4 flex-grow border border-[#e7e5e4]/50">
-              <p class="text-[12px] font-bold text-[#800000] uppercase tracking-wider mb-2">
-                Visi & Misi
-              </p>
-              <p class="text-[14px] text-[#4e4e4e] leading-[1.6] whitespace-pre-wrap">
-                {{ kandidat.visi_misi || '-' }}
-              </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div
+                v-for="kandidat in group.items"
+                :key="kandidat.id"
+                class="bg-white rounded-[20px] p-6 border border-[#e7e5e4] shadow-sm hover:shadow-md transition-shadow group flex flex-col"
+              >
+                <div
+                  class="w-24 h-24 rounded-full bg-[#f0efed] border-4 border-white shadow-sm overflow-hidden mb-4 shrink-0 mx-auto relative group-hover:scale-105 transition-transform duration-300"
+                >
+                  <img
+                    v-if="kandidat.url_foto || kandidat.foto"
+                    :src="kandidat.url_foto || kandidat.foto"
+                    :alt="kandidat.nama"
+                    class="w-full h-full object-cover"
+                  />
+                  <div
+                    v-else
+                    class="w-full h-full flex items-center justify-center bg-[#f5f5f5] text-[#a8a29e]"
+                  >
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                      <path
+                        d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z"
+                      />
+                    </svg>
+                  </div>
+                </div>
+                <h3 class="text-[18px] font-bold text-[#0c0a09] text-center mb-4 leading-tight">
+                  {{ kandidat.nama }}
+                </h3>
+
+                <div class="bg-[#faf7f2] rounded-xl p-4 flex-grow border border-[#e7e5e4]/50">
+                  <p class="text-[12px] font-bold text-[#800000] uppercase tracking-wider mb-2">
+                    Visi & Misi
+                  </p>
+                  <p class="text-[14px] text-[#4e4e4e] leading-[1.6] whitespace-pre-wrap">
+                    {{ kandidat.visi_misi || '-' }}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -476,6 +506,32 @@ const timeRemaining = computed(() => {
 const isResultPublished = computed(() => {
   const pub = store.votingConfig?.is_result_published
   return pub === true || pub === 'TRUE' || String(pub).toLowerCase() === 'true'
+})
+
+const kandidatByRegion = computed(() => {
+  const normalized = store.kandidat.map((kandidat) => ({
+    ...kandidat,
+    region: (kandidat.region || kandidat.wilayah || 'Lainnya').toString().trim() || 'Lainnya',
+  }))
+
+  const grouped = normalized.reduce((acc, kandidat) => {
+    const key = kandidat.region
+    if (!acc[key]) acc[key] = []
+    acc[key].push(kandidat)
+    return acc
+  }, {})
+
+  return Object.keys(grouped)
+    .sort((a, b) => a.localeCompare(b, 'id', { sensitivity: 'base', numeric: true }))
+    .map((region) => ({
+      region,
+      items: grouped[region].sort((a, b) =>
+        (a.nama || '').toString().localeCompare((b.nama || '').toString(), 'id', {
+          sensitivity: 'base',
+          numeric: true,
+        }),
+      ),
+    }))
 })
 
 // Fetch Suara & Pemilih

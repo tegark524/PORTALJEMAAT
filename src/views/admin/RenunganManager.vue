@@ -49,7 +49,7 @@
             </template>
             <template v-else>
               <tr
-                v-for="item in store.renungan"
+                v-for="item in sortedRenungan"
                 :key="item.id"
                 class="hover:bg-[#fafafa] transition-colors group"
               >
@@ -66,7 +66,7 @@
                 <td
                   class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] align-middle text-xs sm:text-[13px] text-[#4e4e4e] italic"
                 >
-                  {{ item.nats }}
+                  {{ item.nats || '-' }}
                 </td>
                 <td
                   class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] align-middle text-xs sm:text-[13px] text-[#4e4e4e]"
@@ -200,11 +200,12 @@
             />
           </div>
           <div>
-            <label class="block text-[13px] font-semibold text-[#4e4e4e] mb-1">Nats (Ayat)</label>
+            <label class="block text-[13px] font-semibold text-[#4e4e4e] mb-1"
+              >Nats (Referensi singkat)</label
+            >
             <input
               v-model="form.nats"
               type="text"
-              required
               placeholder="Contoh: Matius 5:1-12"
               class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2 text-[14px] italic focus:outline-none focus:border-[#800000] focus:ring-1 focus:ring-[#800000]"
             />
@@ -282,7 +283,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useChurchStore } from '@/stores/churchStore'
 
 const store = useChurchStore()
@@ -290,6 +291,14 @@ const showModal = ref(false)
 const isEdit = ref(false)
 const isSubmitting = ref(false)
 const isDeleting = ref(null)
+
+const sortedRenungan = computed(() => {
+  return [...store.renungan].sort((a, b) => {
+    const dateA = new Date(a.tanggal_tayang || a.date || a.tanggal || 0)
+    const dateB = new Date(b.tanggal_tayang || b.date || b.tanggal || 0)
+    return dateB - dateA
+  })
+})
 
 const toast = ref({ show: false, message: '', type: 'success' })
 const showToast = (msg, type = 'success') => {
@@ -307,7 +316,7 @@ const form = ref({
   created_at: '',
 })
 
-onMounted(() => {
+onMounted(async () => {
   const saved = localStorage.getItem('gkjw_renungan_form')
   if (saved) {
     try {

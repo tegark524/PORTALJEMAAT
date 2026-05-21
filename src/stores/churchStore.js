@@ -365,9 +365,14 @@ export const useChurchStore = defineStore('church', {
           { headers: { 'Content-Type': 'text/plain' } },
         )
         if (response.data && response.data.status === 'success') {
-          this.voterSession = response.data.voter
+          this.voterSession = {
+            ...response.data.voter,
+            regions_voted: response.data.regions_voted || [],
+            votes_cast: Number(response.data.votes_cast || 0),
+            votes_remaining: Number(response.data.votes_remaining || 0),
+          }
           localStorage.setItem('gkjw_voter_session', JSON.stringify(this.voterSession))
-          return { success: true }
+          return { success: true, votes_remaining: Number(response.data.votes_remaining || 0) }
         } else {
           throw new Error(response.data?.message || 'Gagal memverifikasi data jemaat.')
         }
@@ -378,22 +383,41 @@ export const useChurchStore = defineStore('church', {
       }
     },
 
-    async submitVote(candidateId) {
+    async submitVote(candidateIdOrIds) {
       if (!this.voterSession) throw new Error('Sesi pemilih tidak ditemukan.')
       const url = import.meta.env.VITE_GAS_API_URL
+      const payload = {
+        action: 'submit_vote',
+        voter_id: this.voterSession.id,
+      }
+      if (Array.isArray(candidateIdOrIds)) {
+        payload.candidate_ids = candidateIdOrIds.map((id) => id.toString())
+      } else {
+        payload.candidate_id = candidateIdOrIds.toString()
+      }
+
       try {
-        const response = await axios.post(
-          url,
-          JSON.stringify({
-            action: 'submit_vote',
-            voter_id: this.voterSession.id,
-            candidate_id: candidateId,
-          }),
-          { headers: { 'Content-Type': 'text/plain' } },
-        )
+        const response = await axios.post(url, JSON.stringify(payload), {
+          headers: { 'Content-Type': 'text/plain' },
+        })
         if (response.data && response.data.status === 'success') {
-          this.logoutVoter() // Keamanan: Auto-logout dan hapus sesi setelah berhasil voting
-          return { success: true, message: response.data.message }
+          const votesRemaining = Number(response.data.votes_remaining || 0)
+          const regionsVoted = response.data.regions_voted || []
+          if (this.voterSession) {
+            this.voterSession.regions_voted = regionsVoted
+            this.voterSession.votes_remaining = votesRemaining
+            this.voterSession.votes_cast = Math.max(0, 2 - votesRemaining)
+            localStorage.setItem('gkjw_voter_session', JSON.stringify(this.voterSession))
+          }
+          if (votesRemaining <= 0) {
+            this.logoutVoter()
+          }
+          return {
+            success: true,
+            message: response.data.message,
+            votes_remaining: votesRemaining,
+            regions_voted: regionsVoted,
+          }
         } else {
           throw new Error(response.data?.message || 'Gagal merekam suara.')
         }
