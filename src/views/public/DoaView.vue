@@ -1,5 +1,5 @@
 <template>
-  <main class="relative w-full pb-24 pt-12 md:pt-24 px-6 md:px-12 max-w-6xl mx-auto min-h-screen">
+  <main class="relative w-full pb-24 pt-24 md:pt-32 px-6 md:px-12 max-w-6xl mx-auto min-h-screen">
     <div
       class="absolute top-0 right-0 w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(200,184,224,0.15)_0%,transparent_70%)] blur-3xl -z-10 pointer-events-none"
     ></div>
