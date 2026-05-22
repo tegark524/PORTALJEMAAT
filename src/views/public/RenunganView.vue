@@ -264,7 +264,7 @@
                   v-if="renungan.tipe_renungan === 'PENGHARAPAN'"
                   class="text-[#ff9900] text-[10px] font-bold tracking-wider uppercase shrink-0"
                 >
-                  Pengharapan
+                  Hidup dalam Pengharapan
                 </span>
                 <span
                   v-if="renungan.tipe_renungan && (renungan.tipe_renungan.startsWith('LAINNYA') || renungan.tipe_renungan === 'UMUM' || renungan.tipe_renungan === 'FOKUS' || renungan.tipe_renungan === 'KELUARGA')"

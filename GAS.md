@@ -574,17 +574,17 @@ function responseJson(obj) {
  * Mengirim notifikasi push otomatis saat data Renungan, Warta headline, atau Jadwal headline baru ditambahkan.
  */
 function sendOneSignalNotification(table, data) {
-  const appId = PropertiesService.getScriptProperties().getProperty("ONESIGNAL_APP_ID");
-  const restApiKey = PropertiesService.getScriptProperties().getProperty("ONESIGNAL_REST_API_KEY");
+  const appId = PropertiesService.getScriptProperties().getProperty("ONESIGNAL_APP_ID") || "1b1767d0-3213-42d2-8ad8-0da5527f18df";
+  const restApiKey = PropertiesService.getScriptProperties().getProperty("ONESIGNAL_REST_API_KEY") || "os_v2_app_dmlwpubscnbnfcwybwsve7yy34ugi6zxdu5uq4ugxlc2qgrq4gdmockc377wyqb57vswk4wqxbemjoj3od3pxyuqsafsh7znikiykqq";
   
   if (!appId || !restApiKey) {
-    console.warn("OneSignal App ID atau REST API Key belum dikonfigurasi di Script Properties!");
+    console.warn("OneSignal App ID atau REST API Key belum dikonfigurasi!");
     return;
   }
 
   let title = "GKJW Jemaat Sukolilo";
   let message = "";
-  let targetUrl = "https://gkjwsukolilo.org/"; // Ubah sesuai domain aktif situs jika berbeda
+  let targetUrl = "https://gkjwsukolilo.netlify.app/"; // Ubah sesuai domain aktif situs jika berbeda
 
   if (table === 'tb_renungan') {
     const tipe = data[7] || "UMUM";
