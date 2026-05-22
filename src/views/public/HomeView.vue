@@ -345,13 +345,13 @@
         </div>
 
         <!-- Tombol Lihat Semua Renungan -->
-        <div class="mt-8 flex justify-center">
-          <router-link
-            to="/renungan"
+        <div v-if="sortedRenungan.length > 4" class="mt-8 flex justify-center">
+          <button
+            @click="showAllRenungan = !showAllRenungan"
             class="bg-transparent border border-[#d6d3d1] text-[#0c0a09] px-6 py-2.5 rounded-full text-[13px] font-bold hover:bg-[#f0efed] transition-colors"
           >
-            Lihat Semua Renungan
-          </router-link>
+            {{ showAllRenungan ? 'Tutup Daftar' : 'Lihat Selengkapnya' }}
+          </button>
         </div>
       </div>
     </section>
@@ -1372,6 +1372,9 @@ const latestRenungan = computed(() => {
 })
 
 const pastRenungan = computed(() => {
+  if (showAllRenungan.value) {
+    return sortedRenungan.value.slice(1) // Tampilkan semua renungan yang lalu
+  }
   return sortedRenungan.value.slice(1, 4) // Tampilkan maksimal 3 renungan di grid bawah
 })
 </script>
