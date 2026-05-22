@@ -229,11 +229,29 @@
         ></div>
 
         <div class="flex-1 w-full relative z-10">
-          <div class="flex items-center gap-2 mb-5">
+          <div class="flex flex-wrap items-center gap-2 mb-5">
             <span
               class="bg-[#f5f5f5] text-[#0c0a09] text-[10px] font-bold uppercase tracking-[0.96px] px-3 py-1.5 rounded-full border border-[#e7e5e4] shrink-0"
               >Terbaru</span
             >
+            <span
+              v-if="latestRenungan && latestRenungan.tipe_renungan === 'REKAT'"
+              class="bg-gradient-to-r from-[#ffedd5] to-[#fed7aa] text-[#c2410c] text-[10px] font-bold uppercase tracking-[0.96px] px-3 py-1.5 rounded-full border border-[#fdba74] shrink-0 flex items-center gap-1 shadow-sm"
+            >
+              <span>🌅</span> Rekat (05:00 Pagi)
+            </span>
+            <span
+              v-if="latestRenungan && latestRenungan.tipe_renungan === 'PENGHARAPAN'"
+              class="bg-gradient-to-r from-[#dbeafe] to-[#bfdbfe] text-[#1d4ed8] text-[10px] font-bold uppercase tracking-[0.96px] px-3 py-1.5 rounded-full border border-[#93c5fd] shrink-0 flex items-center gap-1 shadow-sm"
+            >
+              <span>🌙</span> Hidup Dalam Pengharapan (21:00 Malam)
+            </span>
+            <span
+              v-if="latestRenungan && latestRenungan.tipe_renungan && (latestRenungan.tipe_renungan.startsWith('LAINNYA') || latestRenungan.tipe_renungan === 'UMUM' || latestRenungan.tipe_renungan === 'FOKUS' || latestRenungan.tipe_renungan === 'KELUARGA')"
+              class="bg-gradient-to-r from-[#f5f5f5] to-[#e7e5e4] text-[#0c0a09] text-[10px] font-bold uppercase tracking-[0.96px] px-3 py-1.5 rounded-full border border-[#d6d3d1] shrink-0 flex items-center gap-1 shadow-sm"
+            >
+              <span>📖</span> {{ formatLainnyaBadge(latestRenungan.tipe_renungan) }}
+            </span>
             <span
               v-if="latestRenungan"
               class="text-[#777169] text-[12px] sm:text-[13px] font-medium tracking-wide truncate"
@@ -317,9 +335,29 @@
             @click="openModal(renungan)"
             class="bg-[#faf7f2] rounded-[16px] p-6 border border-[#e7e5e4] shadow-sm flex flex-col h-full hover:-translate-y-1 hover:shadow-md transition-all duration-300 cursor-pointer group"
           >
-            <p class="text-[12px] font-sans tracking-[0.96px] text-[#777169] font-medium mb-3">
-              {{ formatDate(renungan.tanggal_tayang || renungan.tanggal || renungan.date) }}
-            </p>
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <p class="text-[12px] font-sans tracking-[0.96px] text-[#777169] font-medium">
+                {{ formatDate(renungan.tanggal_tayang || renungan.tanggal || renungan.date) }}
+              </p>
+              <span
+                v-if="renungan.tipe_renungan === 'REKAT'"
+                class="bg-[#ffedd5] text-[#c2410c] px-2 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase shrink-0"
+              >
+                🌅 Rekat
+              </span>
+              <span
+                v-if="renungan.tipe_renungan === 'PENGHARAPAN'"
+                class="bg-[#dbeafe] text-[#1d4ed8] px-2 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase shrink-0"
+              >
+                🌙 Pengharapan
+              </span>
+              <span
+                v-if="renungan.tipe_renungan && (renungan.tipe_renungan.startsWith('LAINNYA') || renungan.tipe_renungan === 'UMUM' || renungan.tipe_renungan === 'FOKUS' || renungan.tipe_renungan === 'KELUARGA')"
+                class="bg-[#f5f5f5] text-[#0c0a09] px-2 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase shrink-0 border border-[#e7e5e4]"
+              >
+                📖 {{ formatLainnyaShort(renungan.tipe_renungan) }}
+              </span>
+            </div>
             <h4
               class="font-serif text-[20px] font-bold text-[#0c0a09] mb-2 leading-[1.3] group-hover:text-[#800000] transition-colors"
             >
@@ -808,6 +846,33 @@ const formatDate = (dateString) => {
     month: 'long',
     year: 'numeric',
   })
+}
+
+const formatLainnyaBadge = (tipe) => {
+  if (!tipe) return ''
+  if (tipe === 'UMUM') return 'Lainnya (06:00 Pagi)'
+  if (tipe === 'FOKUS') return 'Lainnya (12:00 Siang)'
+  if (tipe === 'KELUARGA') return 'Lainnya (18:00 Sore)'
+  
+  const parts = tipe.split(' - ')
+  const time = parts[1] || '06:00'
+  const hour = parseInt(time.split(':')[0])
+  let label = 'Pagi'
+  if (hour >= 11 && hour < 15) label = 'Siang'
+  else if (hour >= 15 && hour < 19) label = 'Sore'
+  else if (hour >= 19 || hour < 4) label = 'Malam'
+  return `Lainnya (${time} ${label})`
+}
+
+const formatLainnyaShort = (tipe) => {
+  if (!tipe) return ''
+  if (tipe === 'UMUM') return 'Lainnya (06:00)'
+  if (tipe === 'FOKUS') return 'Lainnya (12:00)'
+  if (tipe === 'KELUARGA') return 'Lainnya (18:00)'
+  
+  const parts = tipe.split(' - ')
+  const time = parts[1] || '06:00'
+  return `Lainnya (${time})`
 }
 
 const getHari = (dateString) => {

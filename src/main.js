@@ -27,3 +27,21 @@ if ('serviceWorker' in navigator) {
       .catch((err) => console.error('PWA Service Worker gagal didaftarkan:', err))
   })
 }
+
+// 4. Inisialisasi OneSignal Web Push
+window.OneSignal = window.OneSignal || []
+window.OneSignal.push(function () {
+  window.OneSignal.init({
+    appId: import.meta.env.VITE_ONESIGNAL_APP_ID || "",
+    safari_web_id: "",
+    notifyButton: {
+      enable: false,
+    },
+    welcomeNotification: {
+      enable: true,
+      title: "GKJW Sukolilo",
+      message: "Terima kasih sudah berlangganan warta dan renungan kami!"
+    }
+  })
+})
+

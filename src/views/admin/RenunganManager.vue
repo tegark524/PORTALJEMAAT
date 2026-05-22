@@ -28,6 +28,9 @@
               </th>
               <th class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] w-32 sm:w-48">Nats</th>
               <th class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] w-24 sm:w-40">Penulis</th>
+              <th class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] w-20 sm:w-28 text-center whitespace-nowrap">
+                Notifikasi
+              </th>
               <th
                 class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] w-20 sm:w-24 text-center whitespace-nowrap"
               >
@@ -42,6 +45,7 @@
                 <td class="px-2 py-3 sm:p-4"><div class="h-4 bg-[#e7e5e4] rounded w-48"></div></td>
                 <td class="px-2 py-3 sm:p-4"><div class="h-4 bg-[#e7e5e4] rounded w-32"></div></td>
                 <td class="px-2 py-3 sm:p-4"><div class="h-4 bg-[#e7e5e4] rounded w-24"></div></td>
+                <td class="px-2 py-3 sm:p-4"><div class="h-4 bg-[#e7e5e4] rounded w-16 mx-auto"></div></td>
                 <td class="px-2 py-3 sm:p-4">
                   <div class="h-8 bg-[#e7e5e4] rounded w-16 mx-auto"></div>
                 </td>
@@ -61,7 +65,27 @@
                 <td
                   class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] align-middle text-xs sm:text-[14px] font-bold text-[#0c0a09]"
                 >
-                  {{ item.judul || item.tema || item.title }}
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <span>{{ item.judul || item.tema || item.title }}</span>
+                    <span
+                      v-if="item.tipe_renungan === 'REKAT'"
+                      class="bg-[#ffedd5] text-[#c2410c] px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase shrink-0"
+                    >
+                      Rekat
+                    </span>
+                    <span
+                      v-if="item.tipe_renungan === 'PENGHARAPAN'"
+                      class="bg-[#dbeafe] text-[#1d4ed8] px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase shrink-0"
+                    >
+                      Pengharapan
+                    </span>
+                    <span
+                      v-if="item.tipe_renungan !== 'REKAT' && item.tipe_renungan !== 'PENGHARAPAN'"
+                      class="bg-[#f3f4f6] text-[#374151] px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase shrink-0 border border-[#e5e7eb]"
+                    >
+                      {{ formatLainnyaShort(item.tipe_renungan) }}
+                    </span>
+                  </div>
                 </td>
                 <td
                   class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] align-middle text-xs sm:text-[13px] text-[#4e4e4e] italic"
@@ -72,6 +96,22 @@
                   class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] align-middle text-xs sm:text-[13px] text-[#4e4e4e]"
                 >
                   {{ item.penulis || '-' }}
+                </td>
+                <td
+                  class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] align-middle text-center whitespace-nowrap"
+                >
+                  <span
+                    v-if="item.status_notif === 'SUDAH' || item.status_notif === 'true' || item.status_notif === true"
+                    class="bg-[#dcfce7] text-[#15803d] px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shrink-0"
+                  >
+                    ✓ Terkirim
+                  </span>
+                  <span
+                    v-else
+                    class="bg-[#f3f4f6] text-[#4b5563] px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shrink-0"
+                  >
+                    ⏳ Menunggu
+                  </span>
                 </td>
                 <td
                   class="px-2 py-3 sm:p-4 border-b border-[#e7e5e4] align-middle whitespace-nowrap text-center"
@@ -229,6 +269,30 @@
               class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2 text-[14px] focus:outline-none focus:border-[#800000] focus:ring-1 focus:ring-[#800000]"
             />
           </div>
+          <div>
+            <label class="block text-[13px] font-semibold text-[#4e4e4e] mb-1">Kategori / Waktu Tayang</label>
+            <select
+              v-model="form.tipe_renungan"
+              required
+              class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2 text-[14px] focus:outline-none focus:border-[#800000] focus:ring-1 focus:ring-[#800000]"
+            >
+              <option value="REKAT">REKAT (Otomatis pukul 05:00 Pagi)</option>
+              <option value="PENGHARAPAN">Hidup dalam Pengharapan (Otomatis pukul 21:00 Malam)</option>
+              <option value="LAINNYA_CUSTOM">Lainnya (bisa pilih jam tayang)</option>
+            </select>
+          </div>
+          <div v-if="form.tipe_renungan === 'LAINNYA_CUSTOM'">
+            <label class="block text-[13px] font-semibold text-[#4e4e4e] mb-1">Pilih Jam Tayang Custom</label>
+            <select
+              v-model="form.jam_custom"
+              required
+              class="w-full border border-[#d6d3d1] rounded-lg px-4 py-2 text-[14px] focus:outline-none focus:border-[#800000] focus:ring-1 focus:ring-[#800000]"
+            >
+              <option v-for="h in 24" :key="h" :value="formatHourOption(h - 1)">
+                Pukul {{ formatHourOption(h - 1) }}
+              </option>
+            </select>
+          </div>
 
           <div class="flex justify-end gap-3 mt-8">
             <button
@@ -313,6 +377,9 @@ const form = ref({
   nats: '',
   isi_renungan: '',
   penulis: '',
+  tipe_renungan: 'LAINNYA_CUSTOM',
+  jam_custom: '06:00',
+  status_notif: 'BELUM',
   created_at: '',
 })
 
@@ -373,6 +440,25 @@ const formatDisplayDate = (dateStr) => {
   }
 }
 
+const formatHourOption = (hour) => {
+  const hStr = String(hour).padStart(2, '0')
+  return `${hStr}:00`
+}
+
+const formatLainnyaShort = (tipe) => {
+  if (!tipe) return ''
+  if (tipe === 'UMUM') return 'Lainnya (06:00)'
+  if (tipe === 'FOKUS') return 'Lainnya (12:00)'
+  if (tipe === 'KELUARGA') return 'Lainnya (18:00)'
+  
+  if (tipe.startsWith('LAINNYA')) {
+    const parts = tipe.split(' - ')
+    const time = parts[1] || '06:00'
+    return `Lainnya (${time})`
+  }
+  return tipe
+}
+
 const resetForm = () => {
   form.value = {
     id: '',
@@ -381,6 +467,9 @@ const resetForm = () => {
     nats: '',
     isi_renungan: '',
     penulis: '',
+    tipe_renungan: 'LAINNYA_CUSTOM',
+    jam_custom: '06:00',
+    status_notif: 'BELUM',
     created_at: '',
   }
   isEdit.value = false
@@ -389,6 +478,29 @@ const resetForm = () => {
 const openModal = (item = null) => {
   if (item) {
     isEdit.value = true
+    let tipeVal = item.tipe_renungan || 'LAINNYA - 06:00'
+    let jamVal = '08:00'
+    
+    if (tipeVal === 'REKAT' || tipeVal === 'PENGHARAPAN') {
+      // Keep as is
+    } else if (tipeVal === 'UMUM' || tipeVal === 'LAINNYA - 06:00' || tipeVal === 'LAINNYA_PAGI') {
+      tipeVal = 'LAINNYA_CUSTOM'
+      jamVal = '06:00'
+    } else if (tipeVal === 'FOKUS' || tipeVal === 'LAINNYA - 12:00' || tipeVal === 'LAINNYA_SIANG') {
+      tipeVal = 'LAINNYA_CUSTOM'
+      jamVal = '12:00'
+    } else if (tipeVal === 'KELUARGA' || tipeVal === 'LAINNYA - 18:00' || tipeVal === 'LAINNYA_SORE') {
+      tipeVal = 'LAINNYA_CUSTOM'
+      jamVal = '18:00'
+    } else if (tipeVal.startsWith('LAINNYA')) {
+      const parts = tipeVal.split(' - ')
+      tipeVal = 'LAINNYA_CUSTOM'
+      jamVal = parts[1] || '08:00'
+    } else {
+      tipeVal = 'LAINNYA_CUSTOM'
+      jamVal = '08:00'
+    }
+
     form.value = {
       id: item.id,
       tanggal_tayang: formatDate(item.tanggal_tayang || item.date || item.tanggal),
@@ -396,6 +508,9 @@ const openModal = (item = null) => {
       nats: item.nats || '',
       isi_renungan: item.isi_renungan || item.isi || item.content || '',
       penulis: item.penulis || '',
+      tipe_renungan: tipeVal,
+      jam_custom: jamVal,
+      status_notif: item.status_notif || 'BELUM',
       created_at: item.created_at || '',
     }
   } else {
@@ -416,7 +531,18 @@ const handleSave = async () => {
     const createdAt =
       isEdit.value && form.value.created_at ? form.value.created_at : new Date().toISOString()
 
-    // Strict Mapping Array: A-G
+    let finalTipe = form.value.tipe_renungan
+    if (finalTipe === 'LAINNYA_PAGI') {
+      finalTipe = 'LAINNYA - 06:00'
+    } else if (finalTipe === 'LAINNYA_SIANG') {
+      finalTipe = 'LAINNYA - 12:00'
+    } else if (finalTipe === 'LAINNYA_SORE') {
+      finalTipe = 'LAINNYA - 18:00'
+    } else if (finalTipe === 'LAINNYA_CUSTOM') {
+      finalTipe = `LAINNYA - ${form.value.jam_custom}`
+    }
+
+    // Strict Mapping Array: A-I
     const payloadData = [
       rowId, // A: id
       form.value.tanggal_tayang, // B: tanggal_tayang
@@ -425,6 +551,8 @@ const handleSave = async () => {
       form.value.isi_renungan, // E: isi_renungan
       form.value.penulis, // F: penulis
       createdAt, // G: created_at
+      finalTipe, // H: tipe_renungan
+      form.value.status_notif, // I: status_notif
     ]
 
     await store.submitGasAction(action, 'tb_renungan', payloadData, rowId)

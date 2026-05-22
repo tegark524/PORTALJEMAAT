@@ -1,4 +1,4 @@
-﻿const SS = SpreadsheetApp.getActiveSpreadsheet();
+const SS = SpreadsheetApp.getActiveSpreadsheet();
 
 // ============================================================
 // 1. ENDPOINT GET — Ambil Data
@@ -251,26 +251,146 @@ lock.releaseLock();
 // ============================================================
 
 function handleCrud(action, sheet, payload) {
-if (action === 'insert') {
-sheet.appendRow(payload.data);
-return responseJson({ status: 'success', message: 'Data berhasil ditambah' });
-}
+  if (action === 'insert') {
+    const table = payload.table;
+    
+    // --- KHUSUS RENUNGAN: Cek pengiriman notifikasi langsung jika tayang hari ini & jam mencukupi ---
+    if (table === 'tb_renungan') {
+      const tipe = payload.data[7] || "UMUM";
+      const tanggalTayangStr = payload.data[1]; // yyyy-MM-dd
+      
+      const tz = "Asia/Jakarta";
+      const now = new Date();
+      const currentDateStr = Utilities.formatDate(now, tz, "yyyy-MM-dd");
+      const currentHour = Number(Utilities.formatDate(now, tz, "H"));
+      
+      let shouldSendNow = false;
+      if (tanggalTayangStr <= currentDateStr) {
+        let targetHour = 6; // Default
+        if (tipe === 'REKAT') targetHour = 5;
+        else if (tipe === 'PENGHARAPAN') targetHour = 21;
+        else if (tipe === 'KELUARGA') targetHour = 18;
+        else if (tipe === 'FOKUS') targetHour = 12;
+        else if (tipe === 'UMUM') targetHour = 6;
+        else if (tipe.indexOf('LAINNYA') === 0) {
+          const parts = tipe.split(' - ');
+          if (parts.length > 1) {
+            targetHour = Number(parts[1].split(':')[0]) || 6;
+          }
+        }
+        if (currentHour >= targetHour) shouldSendNow = true;
+      }
+      
+      if (shouldSendNow && payload.data[8] !== 'SUDAH') {
+        try {
+          sendOneSignalNotification(table, payload.data);
+          payload.data[8] = "SUDAH"; // Tandai terkirim
+        } catch(e) {
+          console.error("Gagal mengirim notifikasi renungan langsung: " + e.toString());
+        }
+      } else {
+        payload.data[8] = payload.data[8] || "BELUM";
+      }
+    }
+    
+    sheet.appendRow(payload.data);
+    
+    // --- KHUSUS WARTA / JADWAL IBADAH: Kirim langsung jika is_headline = true ---
+    if (table === 'tb_warta' || table === 'tb_jadwal_ibadah') {
+      try {
+        let isHeadline = false;
+        if (table === 'tb_warta') {
+          isHeadline = payload.data[6] === true || payload.data[6] === 'true' || payload.data[6] === 'TRUE';
+        } else if (table === 'tb_jadwal_ibadah') {
+          isHeadline = payload.data[7] === true || payload.data[7] === 'true' || payload.data[7] === 'TRUE';
+        }
+        
+        if (isHeadline) {
+          sendOneSignalNotification(table, payload.data);
+        }
+      } catch(e) {
+        console.error("Gagal mengirim notifikasi headline warta/jadwal: " + e.toString());
+      }
+    }
 
-if (action === 'bulk_insert') {
-const rows = payload.data;
-sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, rows[0].length).setValues(rows);
-return responseJson({ status: 'success', message: `${rows.length} jemaat berhasil di-import` });
-}
+    return responseJson({ status: 'success', message: 'Data berhasil ditambah' });
+  }
 
-if (action === 'update') {
-const data = sheet.getDataRange().getValues();
-for (let i = 1; i < data.length; i++) {
-if (data[i][0].toString() === payload.id.toString()) {
-sheet.getRange(i + 1, 1, 1, payload.data.length).setValues([payload.data]);
-return responseJson({ status: 'success', message: 'Data diperbarui' });
-}
-}
-}
+  if (action === 'bulk_insert') {
+    const rows = payload.data;
+    sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, rows[0].length).setValues(rows);
+    return responseJson({ status: 'success', message: `${rows.length} jemaat berhasil di-import` });
+  }
+
+  if (action === 'update') {
+    const data = sheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0].toString() === payload.id.toString()) {
+        const table = payload.table;
+        
+        // Cek notifikasi saat update renungan
+        if (table === 'tb_renungan') {
+          const tipe = payload.data[7] || "UMUM";
+          const tanggalTayangStr = payload.data[1];
+          
+          const tz = "Asia/Jakarta";
+          const now = new Date();
+          const currentDateStr = Utilities.formatDate(now, tz, "yyyy-MM-dd");
+          const currentHour = Number(Utilities.formatDate(now, tz, "H"));
+          
+          let shouldSendNow = false;
+          if (tanggalTayangStr <= currentDateStr) {
+            let targetHour = 6; // Default
+            if (tipe === 'REKAT') targetHour = 5;
+            else if (tipe === 'PENGHARAPAN') targetHour = 21;
+            else if (tipe === 'KELUARGA') targetHour = 18;
+            else if (tipe === 'FOKUS') targetHour = 12;
+            else if (tipe === 'UMUM') targetHour = 6;
+            else if (tipe.indexOf('LAINNYA') === 0) {
+              const parts = tipe.split(' - ');
+              if (parts.length > 1) {
+                targetHour = Number(parts[1].split(':')[0]) || 6;
+              }
+            }
+            if (currentHour >= targetHour) shouldSendNow = true;
+          }
+          
+          if (shouldSendNow && payload.data[8] !== 'SUDAH') {
+            try {
+              sendOneSignalNotification(table, payload.data);
+              payload.data[8] = "SUDAH";
+            } catch(e) {
+              console.error("Gagal mengirim notifikasi renungan langsung saat update: " + e.toString());
+            }
+          }
+        } 
+        // Kirim jika di-update menjadi headline (sebelumnya bukan headline)
+        else if (table === 'tb_warta' || table === 'tb_jadwal_ibadah') {
+          try {
+            let isHeadline = false;
+            let wasHeadline = false;
+            
+            if (table === 'tb_warta') {
+              isHeadline = payload.data[6] === true || payload.data[6] === 'true' || payload.data[6] === 'TRUE';
+              wasHeadline = data[i][6] === true || data[i][6] === 'true' || data[i][6] === 'TRUE';
+            } else if (table === 'tb_jadwal_ibadah') {
+              isHeadline = payload.data[7] === true || payload.data[7] === 'true' || payload.data[7] === 'TRUE';
+              wasHeadline = data[i][7] === true || data[i][7] === 'true' || data[i][7] === 'TRUE';
+            }
+            
+            if (isHeadline && !wasHeadline) {
+              sendOneSignalNotification(table, payload.data);
+            }
+          } catch(e) {
+            console.error("Gagal mengirim notifikasi warta/jadwal update: " + e.toString());
+          }
+        }
+        
+        sheet.getRange(i + 1, 1, 1, payload.data.length).setValues([payload.data]);
+        return responseJson({ status: 'success', message: 'Data diperbarui' });
+      }
+    }
+  }
 
 if (action === 'delete') {
 const data = sheet.getDataRange().getValues();
@@ -441,7 +561,162 @@ return fallback;
 
 /\*_ Format response sebagai JSON _/
 function responseJson(obj) {
-return ContentService
-.createTextOutput(JSON.stringify(obj))
-.setMimeType(ContentService.MimeType.JSON);
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
 }
+
+// ============================================================
+// 7. INTEGRASI PUSH NOTIFICATION ONESIGNAL
+// ============================================================
+
+/**
+ * Mengirim notifikasi push otomatis saat data Renungan, Warta headline, atau Jadwal headline baru ditambahkan.
+ */
+function sendOneSignalNotification(table, data) {
+  const appId = PropertiesService.getScriptProperties().getProperty("ONESIGNAL_APP_ID");
+  const restApiKey = PropertiesService.getScriptProperties().getProperty("ONESIGNAL_REST_API_KEY");
+  
+  if (!appId || !restApiKey) {
+    console.warn("OneSignal App ID atau REST API Key belum dikonfigurasi di Script Properties!");
+    return;
+  }
+
+  let title = "GKJW Jemaat Sukolilo";
+  let message = "";
+  let targetUrl = "https://gkjwsukolilo.org/"; // Ubah sesuai domain aktif situs jika berbeda
+
+  if (table === 'tb_renungan') {
+    const tipe = data[7] || "UMUM";
+    if (tipe === 'REKAT') {
+      title = "🌅 Renungan Rekat Harian";
+    } else if (tipe === 'PENGHARAPAN') {
+      title = "🌙 Hidup Dalam Pengharapan";
+    } else if (tipe === 'KELUARGA') {
+      title = "👪 Renungan Keluarga";
+    } else if (tipe === 'FOKUS') {
+      title = "🎯 Fokus Hari Ini";
+    } else if (tipe.indexOf('LAINNYA') === 0) {
+      const parts = tipe.split(' - ');
+      const timeStr = parts[1] || '06:00';
+      title = "📖 Renungan Harian (" + timeStr + ")";
+    } else {
+      title = "📖 Renungan Harian Baru";
+    }
+    // data[2] = Judul, data[3] = Nats
+    message = (data[2] || "Tema Hari Ini") + (data[3] ? " (" + data[3] + ")" : "");
+    targetUrl += "#renungan";
+  } else if (table === 'tb_warta') {
+    title = "📢 Headline: Warta Jemaat";
+    // data[2] = Kategori, data[3] = Judul
+    const kategoriStr = data[2] ? "[" + data[2] + "] " : "";
+    message = kategoriStr + (data[3] || "Informasi penting terbaru untuk jemaat.");
+    targetUrl += "#beranda";
+  } else if (table === 'tb_jadwal_ibadah') {
+    title = "⛪ Headline: Jadwal Ibadah";
+    // data[1] = Nama Ibadah, data[2] = Tanggal, data[3] = Waktu
+    let tgl = data[2] || "";
+    if (tgl instanceof Date) {
+      tgl = Utilities.formatDate(tgl, "Asia/Jakarta", "dd MMMM yyyy");
+    }
+    message = "Ikuti Ibadah " + (data[1] || "") + " pada " + tgl + " Pukul " + (data[3] || "") + " WIB.";
+    targetUrl += "#beranda";
+  }
+
+  const payload = {
+    app_id: appId,
+    included_segments: ["Subscribed Users"],
+    headings: { "id": title, "en": title },
+    contents: { "id": message, "en": message },
+    url: targetUrl
+  };
+
+  const options = {
+    method: "post",
+    contentType: "application/json; charset=utf-8",
+    headers: {
+      "Authorization": "Basic " + restApiKey
+    },
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+
+  try {
+    const response = UrlFetchApp.fetch("https://onesignal.com/api/v1/notifications", options);
+    console.log("Notifikasi terkirim: " + response.getContentText());
+  } catch (err) {
+    console.error("Gagal mengirim notifikasi OneSignal: " + err.toString());
+  }
+}
+
+/**
+ * PENTING: Jalankan fungsi ini menggunakan Time-driven Trigger setiap 30 menit atau 1 jam sekali.
+ * Mengecek apakah ada renungan terjadwal yang siap dikirim notifikasinya.
+ */
+function checkAndSendScheduledNotifications() {
+  const sheet = SS.getSheetByName('tb_renungan');
+  if (!sheet) return;
+  
+  const tz = "Asia/Jakarta";
+  const now = new Date();
+  const currentDateStr = Utilities.formatDate(now, tz, "yyyy-MM-dd");
+  const currentHour = Number(Utilities.formatDate(now, tz, "H"));
+  
+  const raw = sheet.getDataRange().getValues();
+  if (raw.length < 2) return; // Kosong / Hanya header
+  
+  for (let i = 1; i < raw.length; i++) {
+    const row = raw[i];
+    const rowId = row[0];
+    const tanggalTayangRaw = row[1];
+    const tipe = row[7] || "UMUM";
+    const statusNotif = row[8] || "BELUM";
+    
+    if (statusNotif === 'SUDAH' || statusNotif === 'true' || statusNotif === true) {
+      continue; // Sudah dikirim
+    }
+    
+    // Format tanggal tayang ke yyyy-MM-dd
+    let tanggalTayangStr = "";
+    if (tanggalTayangRaw instanceof Date) {
+      tanggalTayangStr = Utilities.formatDate(tanggalTayangRaw, tz, "yyyy-MM-dd");
+    } else {
+      const d = new Date(tanggalTayangRaw);
+      if (!isNaN(d.getTime())) {
+        tanggalTayangStr = Utilities.formatDate(d, tz, "yyyy-MM-dd");
+      } else {
+        tanggalTayangStr = String(tanggalTayangRaw);
+      }
+    }
+    
+    // Kirim jika tanggal tayang sudah hari ini atau lewat
+    if (tanggalTayangStr && tanggalTayangStr <= currentDateStr) {
+      let shouldSend = false;
+      let targetHour = 6; // Default
+      if (tipe === 'REKAT') targetHour = 5;
+      else if (tipe === 'PENGHARAPAN') targetHour = 21;
+      else if (tipe === 'KELUARGA') targetHour = 18;
+      else if (tipe === 'FOKUS') targetHour = 12;
+      else if (tipe === 'UMUM') targetHour = 6;
+      else if (tipe.indexOf('LAINNYA') === 0) {
+        const parts = tipe.split(' - ');
+        if (parts.length > 1) {
+          targetHour = Number(parts[1].split(':')[0]) || 6;
+        }
+      }
+      if (currentHour >= targetHour) shouldSend = true;
+      
+      if (shouldSend) {
+        try {
+          sendOneSignalNotification('tb_renungan', row);
+          // Update status_notif ke SUDAH di spreadsheet (Kolom ke-9 / Kolom I)
+          sheet.getRange(i + 1, 9).setValue("SUDAH");
+          console.log("Notifikasi renungan terjadwal terkirim untuk ID: " + rowId);
+        } catch(e) {
+          console.error("Gagal mengirim notifikasi terjadwal ID: " + rowId + " - " + e.toString());
+        }
+      }
+    }
+  }
+}
+
