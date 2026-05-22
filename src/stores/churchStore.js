@@ -53,6 +53,9 @@ export const useChurchStore = defineStore('church', {
     // State spesifik untuk sistem Voting
     voterSession: null,
     lastUpdated: null,
+
+    // State tambahan untuk caching & network state
+    isOnline: typeof window !== 'undefined' ? window.navigator.onLine : true,
   }),
   getters: {
     isKPU: (state) => {
@@ -68,27 +71,35 @@ export const useChurchStore = defineStore('church', {
     async initializeHomeData() {
       if (this.isLoaded) return // "Load Once" Strategy
 
-      // Coba load dari localStorage cache dulu (Stale-While-Revalidate)
+      // Coba load dari localStorage cache dulu (Stale-While-Revalidate dengan TTL 2 jam)
       const cached = localStorage.getItem('gkjw_home_cache')
       let hasCache = false
       if (cached) {
         try {
           const parsed = JSON.parse(cached)
           if (parsed && typeof parsed === 'object') {
+            const cacheTime = parsed.timestamp ? new Date(parsed.timestamp).getTime() : 0
+            const now = new Date().getTime()
+            const age = now - cacheTime
+
             this.warta = parsed.warta || []
             this.renungan = parsed.renungan || []
             this.jadwal = parsed.jadwal || []
             this.doa = parsed.doa || []
             this.lastUpdated = parsed.lastUpdated || null
-            this.isLoaded = true // Instan hilangkan loading screen!
-            hasCache = true
+
+            // Jika umur cache kurang dari 2 jam (7200000 ms), gunakan cache secara instan
+            if (age < 7200000) {
+              this.isLoaded = true // Instan hilangkan loading screen!
+              hasCache = true
+            }
           }
         } catch (e) {
           console.error('Gagal memproses local cache:', e)
         }
       }
 
-      // Jika tidak punya cache, tampilkan loading full-screen
+      // Jika tidak punya cache atau cache kedaluwarsa, tampilkan loading full-screen
       if (!hasCache) {
         this.isLoading = true
       }
@@ -149,13 +160,14 @@ export const useChurchStore = defineStore('church', {
         this.isLoaded = true
         this.lastUpdated = new Date().toISOString()
 
-        // Simpan data terbaru ke cache localStorage
+        // Simpan data terbaru ke cache localStorage dengan timestamp
         localStorage.setItem('gkjw_home_cache', JSON.stringify({
           warta: this.warta,
           renungan: this.renungan,
           jadwal: this.jadwal,
           doa: this.doa,
-          lastUpdated: this.lastUpdated
+          lastUpdated: this.lastUpdated,
+          timestamp: new Date().toISOString()
         }))
       } catch (err) {
         console.error('Gagal load data:', err)
@@ -226,14 +238,17 @@ export const useChurchStore = defineStore('church', {
 
         this.lastUpdated = new Date().toISOString()
 
-        // Perbarui cache localStorage dengan data segar
+        // Perbarui cache localStorage dengan data segar dan timestamp baru
         localStorage.setItem('gkjw_home_cache', JSON.stringify({
           warta: this.warta,
           renungan: this.renungan,
           jadwal: this.jadwal,
           doa: this.doa,
-          lastUpdated: this.lastUpdated
+          lastUpdated: this.lastUpdated,
+          timestamp: new Date().toISOString()
         }))
+
+
       } catch (err) {
         console.error('Gagal silent refresh data:', err)
       }

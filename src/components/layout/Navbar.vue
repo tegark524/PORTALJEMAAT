@@ -1,6 +1,7 @@
 <template>
   <nav
-    class="fixed top-0 left-0 w-full z-50 bg-[#ffffff]/80 backdrop-blur-md border-b border-[#e7e5e4] shadow-sm transition-all duration-300"
+    class="fixed left-0 w-full z-50 bg-[#ffffff]/80 backdrop-blur-md border-b border-[#e7e5e4] shadow-sm transition-all duration-300"
+    :style="{ top: !store.isOnline ? '40px' : '0px' }"
   >
     <div class="max-w-6xl mx-auto px-6 md:px-12 h-16 flex items-center justify-between">
       <!-- Logo -->

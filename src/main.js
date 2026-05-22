@@ -17,3 +17,13 @@ app.use(createPinia())
 app.use(router)
 
 app.mount('#app')
+
+// 3. Registrasi PWA Service Worker untuk akses Offline & Instalasi Aplikasi
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then((reg) => console.log('Service Worker terdaftar di scope:', reg.scope))
+      .catch((err) => console.error('PWA Service Worker gagal didaftarkan:', err))
+  })
+}
