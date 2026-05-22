@@ -45,3 +45,6 @@ __screenshots__/
 
 # Local Netlify folder
 .netlify
+
+# Google Apps Script code containing sensitive keys
+GAS.md
