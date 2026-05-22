@@ -225,44 +225,17 @@
       >
         <!-- Decorative Background Orb -->
         <div
-          class="absolute top-0 right-0 w-64 h-64 bg-[radial-gradient(circle,rgba(200,184,224,0.15)_0%,transparent_70%)] rounded-full blur-3xl pointer-events-none"
+            class="absolute top-0 right-0 w-64 h-64 bg-[radial-gradient(circle,rgba(200,184,224,0.15)_0%,transparent_70%)] rounded-full blur-3xl pointer-events-none"
         ></div>
 
         <div class="flex-1 w-full relative z-10">
-          <div class="flex flex-wrap items-center gap-2 mb-5">
-            <span
-              class="bg-[#f5f5f5] text-[#0c0a09] text-[10px] font-bold uppercase tracking-[0.96px] px-3 py-1.5 rounded-full border border-[#e7e5e4] shrink-0"
-              >Terbaru</span
-            >
-            <span
-              v-if="latestRenungan && latestRenungan.tipe_renungan === 'REKAT'"
-              class="text-[#c2410c] text-[11px] font-bold uppercase tracking-[0.96px] shrink-0"
-            >
-              Rekat (05:00 Pagi)
-            </span>
-            <span
-              v-if="latestRenungan && latestRenungan.tipe_renungan === 'PENGHARAPAN'"
-              class="text-[#1d4ed8] text-[11px] font-bold uppercase tracking-[0.96px] shrink-0"
-            >
-              Hidup Dalam Pengharapan (21:00 Malam)
-            </span>
-            <span
-              v-if="latestRenungan && latestRenungan.tipe_renungan && (latestRenungan.tipe_renungan.startsWith('LAINNYA') || latestRenungan.tipe_renungan === 'UMUM' || latestRenungan.tipe_renungan === 'FOKUS' || latestRenungan.tipe_renungan === 'KELUARGA')"
-              class="text-[#777169] text-[11px] font-bold uppercase tracking-[0.96px] shrink-0"
-            >
-              {{ formatLainnyaBadge(latestRenungan.tipe_renungan) }}
-            </span>
-            <span
-              v-if="latestRenungan"
-              class="text-[#777169] text-[12px] sm:text-[13px] font-medium tracking-wide truncate"
-            >
-              {{
-                formatDate(
-                  latestRenungan.tanggal_tayang || latestRenungan.tanggal || latestRenungan.date,
-                )
-              }}
-            </span>
-          </div>
+          <p class="text-[12px] md:text-[13px] font-bold uppercase tracking-wider text-[#800000] mb-5">
+            {{
+              formatDate(
+                latestRenungan?.tanggal_tayang || latestRenungan?.tanggal || latestRenungan?.date,
+              )
+            }}
+          </p>
 
           <div
             v-if="store.isLoading"
@@ -335,29 +308,9 @@
             @click="openModal(renungan)"
             class="bg-[#faf7f2] rounded-[16px] p-6 border border-[#e7e5e4] shadow-sm flex flex-col h-full hover:-translate-y-1 hover:shadow-md transition-all duration-300 cursor-pointer group"
           >
-            <div class="flex items-center justify-between gap-2 mb-3">
-              <p class="text-[12px] font-sans tracking-[0.96px] text-[#777169] font-medium">
-                {{ formatDate(renungan.tanggal_tayang || renungan.tanggal || renungan.date) }}
-              </p>
-              <span
-                v-if="renungan.tipe_renungan === 'REKAT'"
-                class="text-[#c2410c] text-[10px] font-bold tracking-wider uppercase shrink-0"
-              >
-                Rekat
-              </span>
-              <span
-                v-if="renungan.tipe_renungan === 'PENGHARAPAN'"
-                class="text-[#1d4ed8] text-[10px] font-bold tracking-wider uppercase shrink-0"
-              >
-                Pengharapan
-              </span>
-              <span
-                v-if="renungan.tipe_renungan && (renungan.tipe_renungan.startsWith('LAINNYA') || renungan.tipe_renungan === 'UMUM' || renungan.tipe_renungan === 'FOKUS' || renungan.tipe_renungan === 'KELUARGA')"
-                class="text-[#777169] text-[10px] font-bold tracking-wider uppercase shrink-0"
-              >
-                {{ formatLainnyaShort(renungan.tipe_renungan) }}
-              </span>
-            </div>
+            <p class="text-[12px] font-sans tracking-[0.96px] text-[#777169] font-medium mb-3">
+              {{ formatDate(renungan.tanggal_tayang || renungan.tanggal || renungan.date) }}
+            </p>
             <h4
               class="font-serif text-[20px] font-bold text-[#0c0a09] mb-2 leading-[1.3] group-hover:text-[#800000] transition-colors"
             >
@@ -508,7 +461,7 @@
                 </button>
               </div>
 
-              <p class="text-[12px] font-semibold tracking-[0.96px] text-[#800000] uppercase mb-4">
+              <p class="text-[12px] font-semibold tracking-[0.96px] text-[#800000] uppercase mb-2">
                 {{
                   selectedItem?.formattedDate ||
                   formatDate(
@@ -516,6 +469,24 @@
                   )
                 }}
               </p>
+              <span
+                v-if="selectedItem?.tipe_renungan === 'REKAT'"
+                class="inline-block text-[#c2410c] text-[11px] font-bold uppercase tracking-[0.96px] mb-4"
+              >
+                Rekat
+              </span>
+              <span
+                v-else-if="selectedItem?.tipe_renungan === 'PENGHARAPAN'"
+                class="inline-block text-[#ff9900] text-[11px] font-bold uppercase tracking-[0.96px] mb-4"
+              >
+                Hidup dalam Pengharapan
+              </span>
+              <span
+                v-else-if="selectedItem?.tipe_renungan && (selectedItem?.tipe_renungan.startsWith('LAINNYA') || selectedItem?.tipe_renungan === 'UMUM' || selectedItem?.tipe_renungan === 'FOKUS' || selectedItem?.tipe_renungan === 'KELUARGA')"
+                class="inline-block text-[#777169] text-[11px] font-bold uppercase tracking-[0.96px] mb-4"
+              >
+                {{ formatLainnyaBadge(selectedItem?.tipe_renungan) }}
+              </span>
               <h2
                 class="font-serif text-[32px] md:text-[40px] font-bold text-[#0c0a09] leading-[1.1] mb-3 pr-8"
               >

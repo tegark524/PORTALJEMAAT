@@ -77,7 +77,7 @@
                       v-if="item.tipe_renungan === 'PENGHARAPAN'"
                       class="bg-[#dbeafe] text-[#1d4ed8] px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase shrink-0"
                     >
-                      Pengharapan
+                      Hidup dalam Pengharapan
                     </span>
                     <span
                       v-if="item.tipe_renungan !== 'REKAT' && item.tipe_renungan !== 'PENGHARAPAN'"

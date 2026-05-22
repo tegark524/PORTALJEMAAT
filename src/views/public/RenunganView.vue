@@ -53,13 +53,13 @@
               v-if="activeRenungan.tipe_renungan === 'REKAT'"
               class="text-[#c2410c] text-[11px] font-bold uppercase tracking-[0.96px] shrink-0"
             >
-              Rekat (05:00 Pagi)
+              Rekat
             </span>
             <span
               v-if="activeRenungan.tipe_renungan === 'PENGHARAPAN'"
-              class="text-[#1d4ed8] text-[11px] font-bold uppercase tracking-[0.96px] shrink-0"
+              class="text-[#ff9900] text-[11px] font-bold uppercase tracking-[0.96px] shrink-0"
             >
-              Hidup Dalam Pengharapan (21:00 Malam)
+              Hidup dalam Pengharapan
             </span>
             <span
               v-if="activeRenungan.tipe_renungan && (activeRenungan.tipe_renungan.startsWith('LAINNYA') || activeRenungan.tipe_renungan === 'UMUM' || activeRenungan.tipe_renungan === 'FOKUS' || activeRenungan.tipe_renungan === 'KELUARGA')"
@@ -262,7 +262,7 @@
                 </span>
                 <span
                   v-if="renungan.tipe_renungan === 'PENGHARAPAN'"
-                  class="text-[#1d4ed8] text-[10px] font-bold tracking-wider uppercase shrink-0"
+                  class="text-[#ff9900] text-[10px] font-bold tracking-wider uppercase shrink-0"
                 >
                   Pengharapan
                 </span>
