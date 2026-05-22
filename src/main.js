@@ -41,6 +41,25 @@ window.OneSignal.push(function () {
       enable: true,
       title: "GKJW Sukolilo",
       message: "Terima kasih sudah berlangganan warta dan renungan kami!"
+    },
+    promptOptions: {
+      slidedown: {
+        prompts: [
+          {
+            type: "push",
+            autoPrompt: true,
+            text: {
+              actionMessage: "Izinkan GKJW Sukolilo mengirim notifikasi untuk renungan harian dan warta jemaat.",
+              acceptButton: "Izinkan",
+              cancelButton: "Nanti"
+            },
+            delay: {
+              pageViews: 1,
+              timeDelay: 3
+            }
+          }
+        ]
+      }
     }
   })
 })
