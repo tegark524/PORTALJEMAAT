@@ -51,21 +51,21 @@
             </p>
             <span
               v-if="activeRenungan.tipe_renungan === 'REKAT'"
-              class="bg-gradient-to-r from-[#ffedd5] to-[#fed7aa] text-[#c2410c] text-[10px] font-bold uppercase tracking-[0.96px] px-3 py-1.5 rounded-full border border-[#fdba74] shrink-0 flex items-center gap-1 shadow-sm"
+              class="text-[#c2410c] text-[11px] font-bold uppercase tracking-[0.96px] shrink-0"
             >
-              <span>🌅</span> Rekat (05:00 Pagi)
+              Rekat (05:00 Pagi)
             </span>
             <span
               v-if="activeRenungan.tipe_renungan === 'PENGHARAPAN'"
-              class="bg-gradient-to-r from-[#dbeafe] to-[#bfdbfe] text-[#1d4ed8] text-[10px] font-bold uppercase tracking-[0.96px] px-3 py-1.5 rounded-full border border-[#93c5fd] shrink-0 flex items-center gap-1 shadow-sm"
+              class="text-[#1d4ed8] text-[11px] font-bold uppercase tracking-[0.96px] shrink-0"
             >
-              <span>🌙</span> Hidup Dalam Pengharapan (21:00 Malam)
+              Hidup Dalam Pengharapan (21:00 Malam)
             </span>
             <span
               v-if="activeRenungan.tipe_renungan && (activeRenungan.tipe_renungan.startsWith('LAINNYA') || activeRenungan.tipe_renungan === 'UMUM' || activeRenungan.tipe_renungan === 'FOKUS' || activeRenungan.tipe_renungan === 'KELUARGA')"
-              class="bg-gradient-to-r from-[#f5f5f5] to-[#e7e5e4] text-[#0c0a09] text-[10px] font-bold uppercase tracking-[0.96px] px-3 py-1.5 rounded-full border border-[#d6d3d1] shrink-0 flex items-center gap-1 shadow-sm"
+              class="text-[#777169] text-[11px] font-bold uppercase tracking-[0.96px] shrink-0"
             >
-              <span>📖</span> {{ formatLainnyaBadge(activeRenungan.tipe_renungan) }}
+              {{ formatLainnyaBadge(activeRenungan.tipe_renungan) }}
             </span>
           </div>
           <h2
@@ -256,21 +256,21 @@
                 </p>
                 <span
                   v-if="renungan.tipe_renungan === 'REKAT'"
-                  class="bg-[#ffedd5] text-[#c2410c] px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase shrink-0"
+                  class="text-[#c2410c] text-[10px] font-bold tracking-wider uppercase shrink-0"
                 >
-                  🌅 Rekat
+                  Rekat
                 </span>
                 <span
                   v-if="renungan.tipe_renungan === 'PENGHARAPAN'"
-                  class="bg-[#dbeafe] text-[#1d4ed8] px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase shrink-0"
+                  class="text-[#1d4ed8] text-[10px] font-bold tracking-wider uppercase shrink-0"
                 >
-                  🌙 Pengharapan
+                  Pengharapan
                 </span>
                 <span
                   v-if="renungan.tipe_renungan && (renungan.tipe_renungan.startsWith('LAINNYA') || renungan.tipe_renungan === 'UMUM' || renungan.tipe_renungan === 'FOKUS' || renungan.tipe_renungan === 'KELUARGA')"
-                  class="bg-[#f5f5f5] text-[#0c0a09] px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase shrink-0 border border-[#e7e5e4]"
+                  class="text-[#777169] text-[10px] font-bold tracking-wider uppercase shrink-0"
                 >
-                  📖 {{ formatLainnyaShort(renungan.tipe_renungan) }}
+                  {{ formatLainnyaShort(renungan.tipe_renungan) }}
                 </span>
               </div>
               <h4
