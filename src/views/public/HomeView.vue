@@ -307,7 +307,10 @@
         </div>
       </div>
       <div v-else-if="pastRenungan.length > 0">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div 
+          class="grid grid-cols-1 md:grid-cols-3 gap-6"
+          :class="{ 'hidden md:grid': !showAllRenungan }"
+        >
           <div
             v-for="(renungan, index) in pastRenungan"
             :key="index"
@@ -345,7 +348,11 @@
         </div>
 
         <!-- Tombol Lihat Semua Renungan -->
-        <div v-if="sortedRenungan.length > 4" class="mt-8 flex justify-center">
+        <div 
+          v-if="sortedRenungan && sortedRenungan.length > 1" 
+          class="mt-8 flex justify-center"
+          :class="{ 'md:hidden': sortedRenungan.length <= 4 && !showAllRenungan }"
+        >
           <button
             @click="showAllRenungan = !showAllRenungan"
             class="bg-transparent border border-[#d6d3d1] text-[#0c0a09] px-6 py-2.5 rounded-full text-[13px] font-bold hover:bg-[#f0efed] transition-colors"
@@ -1093,10 +1100,15 @@ const isVotingActive = computed(() => {
 // --- Warta Logic ---
 // Sort data by date descending
 const sortedWarta = computed(() => {
-  if (!store.warta.length) return []
-  return [...store.warta].sort(
-    (a, b) => new Date(b.tanggal || b.date) - new Date(a.tanggal || a.date),
-  )
+  if (!store.warta || !Array.isArray(store.warta) || !store.warta.length) return []
+  return [...store.warta]
+    .filter(w => w)
+    .sort((a, b) => {
+      const dateB = new Date(b.tanggal || b.date)
+      const dateA = new Date(a.tanggal || a.date)
+      if (isNaN(dateB.getTime()) || isNaN(dateA.getTime())) return 0
+      return dateB - dateA
+    })
 })
 
 // Filter sorted data by search
@@ -1196,15 +1208,24 @@ const shareContent = async (item) => {
 
 // Schedule Logic: Filter schedules that haven't passed
 const validJadwal = computed(() => {
-  if (!store.jadwal.length) return []
+  if (!store.jadwal || !Array.isArray(store.jadwal) || !store.jadwal.length) return []
   const now = new Date()
   now.setHours(0, 0, 0, 0) // Atur filter agar jadwal hari ini tetap tampil sampai ganti hari
   return store.jadwal
     .filter((j) => {
-      const jadwalDate = new Date(j.tanggal || j.date || new Date().toISOString())
-      return jadwalDate >= now
+      if (!j) return false
+      const rawDate = j.tanggal || j.date
+      if (!rawDate) return false
+      const jadwalDate = new Date(rawDate)
+      return !isNaN(jadwalDate.getTime()) && jadwalDate >= now
     })
-    .sort((a, b) => new Date(a.tanggal || a.date) - new Date(b.tanggal || b.date))
+    .sort((a, b) => {
+      if (!a || !b) return 0
+      const dateA = new Date(a.tanggal || a.date)
+      const dateB = new Date(b.tanggal || b.date)
+      if (isNaN(dateA.getTime()) || isNaN(dateB.getTime())) return 0
+      return dateA - dateB
+    })
 })
 
 // List Jadwal (Reguler) di bawah: Menampilkan semua jadwal termasuk headline
@@ -1233,12 +1254,53 @@ const formatWaktu = (timeStr) => {
 const combinedHeadlines = computed(() => {
   const headlines = []
 
-  store.warta.forEach((w) => {
-    if (w.is_headline === true || w.is_headline === 'TRUE' || w.is_headline === 'true') {
+  if (store.warta && Array.isArray(store.warta)) {
+    store.warta.forEach((w) => {
+      if (!w) return
+      if (w.is_headline === true || w.is_headline === 'TRUE' || w.is_headline === 'true') {
+        headlines.push({
+          id: 'warta-' + w.id,
+          type: 'warta',
+          label: 'Warta Penting',
+          title: w.judul || w.title,
+          date: w.tanggal || w.date,
+          image: w.display_gambar || w.url_gambar || w.gambar,
+          desc: w.isi || w.isi_lengkap || w.content || w.ringkasan,
+          raw: w,
+        })
+      }
+    })
+  }
+
+  if (validJadwal.value && Array.isArray(validJadwal.value)) {
+    validJadwal.value.forEach((j) => {
+      if (!j) return
+      if (j.is_headline === true || j.is_headline === 'TRUE' || j.is_headline === 'true') {
+        headlines.push({
+          id: 'jadwal-' + j.id,
+          type: 'jadwal',
+          label: 'Jadwal Spesial',
+          title: j.nama_ibadah || j.kategori,
+          date: j.tanggal || j.date,
+          time: j.waktu,
+          location: j.lokasi,
+          desc: j.keterangan,
+          link: j.link,
+          image: j.display_gambar || j.url_gambar || j.gambar, // Fallback gambar jadwal
+          raw: j,
+        })
+      }
+    })
+  }
+
+  // Fallback: Jika admin lupa mencentang satupun headline, kita tampilkan warta terbaru
+  if (headlines.length === 0 && sortedWarta.value && sortedWarta.value.length > 0) {
+    const w = sortedWarta.value[0]
+    if (w) {
       headlines.push({
         id: 'warta-' + w.id,
         type: 'warta',
-        label: 'Warta Penting',
+        label: 'Warta Terbaru',
         title: w.judul || w.title,
         date: w.tanggal || w.date,
         image: w.display_gambar || w.url_gambar || w.gambar,
@@ -1246,42 +1308,15 @@ const combinedHeadlines = computed(() => {
         raw: w,
       })
     }
-  })
-
-  validJadwal.value.forEach((j) => {
-    if (j.is_headline === true || j.is_headline === 'TRUE' || j.is_headline === 'true') {
-      headlines.push({
-        id: 'jadwal-' + j.id,
-        type: 'jadwal',
-        label: 'Jadwal Spesial',
-        title: j.nama_ibadah || j.kategori,
-        date: j.tanggal || j.date,
-        time: j.waktu,
-        location: j.lokasi,
-        desc: j.keterangan,
-        link: j.link,
-        image: j.display_gambar || j.url_gambar || j.gambar, // Fallback gambar jadwal
-        raw: j,
-      })
-    }
-  })
-
-  // Fallback: Jika admin lupa mencentang satupun headline, kita tampilkan warta terbaru
-  if (headlines.length === 0 && sortedWarta.value.length > 0) {
-    const w = sortedWarta.value[0]
-    headlines.push({
-      id: 'warta-' + w.id,
-      type: 'warta',
-      label: 'Warta Terbaru',
-      title: w.judul || w.title,
-      date: w.tanggal || w.date,
-      image: w.display_gambar || w.url_gambar || w.gambar,
-      desc: w.isi || w.isi_lengkap || w.content || w.ringkasan,
-      raw: w,
-    })
   }
 
-  return headlines.sort((a, b) => new Date(b.date) - new Date(a.date))
+  return headlines.sort((a, b) => {
+    if (!a || !b) return 0
+    const dateB = new Date(b.date)
+    const dateA = new Date(a.date)
+    if (isNaN(dateB.getTime()) || isNaN(dateA.getTime())) return 0
+    return dateB - dateA
+  })
 })
 
 const currentSlide = ref(0)
@@ -1351,31 +1386,37 @@ onUnmounted(() => stopSlide())
 
 // --- Renungan Logic ---
 const sortedRenungan = computed(() => {
-  if (!store.renungan.length) return []
+  if (!store.renungan || !Array.isArray(store.renungan) || !store.renungan.length) return []
   const now = new Date()
   now.setHours(23, 59, 59, 999) // Batas akhir hari ini
 
   return [...store.renungan]
     .filter((r) => {
-      const rDate = new Date(r.tanggal_tayang || r.date || r.tanggal)
-      return rDate <= now
+      if (!r) return false
+      const rawDate = r.tanggal_tayang || r.date || r.tanggal
+      if (!rawDate) return false
+      const rDate = new Date(rawDate)
+      return !isNaN(rDate.getTime()) && rDate <= now
     })
-    .sort(
-      (a, b) =>
-        new Date(b.tanggal_tayang || b.date || b.tanggal) -
-        new Date(a.tanggal_tayang || a.date || a.tanggal),
-    )
+    .sort((a, b) => {
+      if (!a || !b) return 0
+      const dateB = new Date(b.tanggal_tayang || b.date || b.tanggal)
+      const dateA = new Date(a.tanggal_tayang || a.date || a.tanggal)
+      if (isNaN(dateB.getTime()) || isNaN(dateA.getTime())) return 0
+      return dateB - dateA
+    })
 })
 
 const latestRenungan = computed(() => {
-  return sortedRenungan.value.length ? sortedRenungan.value[0] : null
+  return sortedRenungan.value && sortedRenungan.value.length ? sortedRenungan.value[0] : null
 })
 
 const pastRenungan = computed(() => {
+  const allPast = sortedRenungan.value ? sortedRenungan.value.slice(1) : []
   if (showAllRenungan.value) {
-    return sortedRenungan.value.slice(1) // Tampilkan semua renungan yang lalu
+    return allPast // Tampilkan semua renungan yang lalu
   }
-  return sortedRenungan.value.slice(1, 4) // Tampilkan maksimal 3 renungan di grid bawah
+  return allPast.slice(0, 3) // Tampilkan maksimal 3 renungan di grid bawah
 })
 </script>
 

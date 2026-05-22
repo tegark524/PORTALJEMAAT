@@ -299,20 +299,25 @@ const formatDate = (dateString) => {
 
 // Sort data by newest date
 const sortedRenungan = computed(() => {
-  if (!store.renungan.length) return []
+  if (!store.renungan || !Array.isArray(store.renungan) || !store.renungan.length) return []
   const now = new Date()
   now.setHours(23, 59, 59, 999) // Batas akhir hari ini
 
   return [...store.renungan]
     .filter((r) => {
-      const rDate = new Date(r.tanggal_tayang || r.date || r.tanggal)
-      return rDate <= now
+      if (!r) return false
+      const rawDate = r.tanggal_tayang || r.date || r.tanggal
+      if (!rawDate) return false
+      const rDate = new Date(rawDate)
+      return !isNaN(rDate.getTime()) && rDate <= now
     })
-    .sort(
-      (a, b) =>
-        new Date(b.tanggal_tayang || b.date || b.tanggal) -
-        new Date(a.tanggal_tayang || a.date || a.tanggal),
-    )
+    .sort((a, b) => {
+      if (!a || !b) return 0
+      const dateB = new Date(b.tanggal_tayang || b.date || b.tanggal)
+      const dateA = new Date(a.tanggal_tayang || a.date || a.tanggal)
+      if (isNaN(dateB.getTime()) || isNaN(dateA.getTime())) return 0
+      return dateB - dateA
+    })
 })
 
 // Set the latest as active initially
