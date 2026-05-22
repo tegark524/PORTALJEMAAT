@@ -68,7 +68,31 @@ export const useChurchStore = defineStore('church', {
     async initializeHomeData() {
       if (this.isLoaded) return // "Load Once" Strategy
 
-      this.isLoading = true
+      // Coba load dari localStorage cache dulu (Stale-While-Revalidate)
+      const cached = localStorage.getItem('gkjw_home_cache')
+      let hasCache = false
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached)
+          if (parsed && typeof parsed === 'object') {
+            this.warta = parsed.warta || []
+            this.renungan = parsed.renungan || []
+            this.jadwal = parsed.jadwal || []
+            this.doa = parsed.doa || []
+            this.lastUpdated = parsed.lastUpdated || null
+            this.isLoaded = true // Instan hilangkan loading screen!
+            hasCache = true
+          }
+        } catch (e) {
+          console.error('Gagal memproses local cache:', e)
+        }
+      }
+
+      // Jika tidak punya cache, tampilkan loading full-screen
+      if (!hasCache) {
+        this.isLoading = true
+      }
+
       const url = import.meta.env.VITE_GAS_API_URL
       try {
         const [w, r, j, d] = await Promise.all([
@@ -124,10 +148,24 @@ export const useChurchStore = defineStore('church', {
 
         this.isLoaded = true
         this.lastUpdated = new Date().toISOString()
+
+        // Simpan data terbaru ke cache localStorage
+        localStorage.setItem('gkjw_home_cache', JSON.stringify({
+          warta: this.warta,
+          renungan: this.renungan,
+          jadwal: this.jadwal,
+          doa: this.doa,
+          lastUpdated: this.lastUpdated
+        }))
       } catch (err) {
         console.error('Gagal load data:', err)
       } finally {
         this.isLoading = false
+      }
+
+      // Jika kita tadi menggunakan cache, trigger pembaruan sunyi setelah halaman ter-load
+      if (hasCache) {
+        this.silentRefresh()
       }
     },
 
@@ -187,6 +225,15 @@ export const useChurchStore = defineStore('church', {
         }))
 
         this.lastUpdated = new Date().toISOString()
+
+        // Perbarui cache localStorage dengan data segar
+        localStorage.setItem('gkjw_home_cache', JSON.stringify({
+          warta: this.warta,
+          renungan: this.renungan,
+          jadwal: this.jadwal,
+          doa: this.doa,
+          lastUpdated: this.lastUpdated
+        }))
       } catch (err) {
         console.error('Gagal silent refresh data:', err)
       }
