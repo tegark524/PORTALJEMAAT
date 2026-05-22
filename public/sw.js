@@ -1,10 +1,12 @@
-const CACHE_NAME = 'gkjw-sukolilo-cache-v2';
+const CACHE_NAME = 'gkjw-sukolilo-cache-v3';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/favicon.ico',
   '/logo.png',
-  '/favlogo.png'
+  '/favlogo.png',
+  '/logo_maskable.png',
+  '/logo_maskable_192.png'
 ];
 
 // Install Event
