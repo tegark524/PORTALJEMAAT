@@ -1,5 +1,5 @@
 <template>
-  <main class="relative w-full pb-24 pt-24 md:pt-32 px-6 md:px-12 max-w-6xl mx-auto min-h-screen">
+  <main class="relative w-full pb-24 pt-12 md:pt-16 px-6 md:px-12 max-w-6xl mx-auto min-h-screen">
     <!-- Latar Belakang Estetik -->
     <div
       class="absolute top-0 right-0 w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(220,38,38,0.08)_0%,transparent_70%)] blur-3xl -z-10 pointer-events-none"
@@ -7,6 +7,25 @@
     <div
       class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(37,99,235,0.08)_0%,transparent_70%)] blur-3xl -z-10 pointer-events-none"
     ></div>
+
+    <!-- Mini Header: Logo + Link Kembali -->
+    <header class="flex items-center justify-between mb-8">
+      <router-link to="/" class="flex items-center gap-2.5 group">
+        <img src="@/assets/logo.png" alt="GKJW Logo" class="h-8 w-auto" />
+        <span class="font-serif text-[16px] font-bold text-[#800000] group-hover:opacity-80 transition-opacity">
+          GKJW Sukolilo
+        </span>
+      </router-link>
+      <router-link
+        to="/"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#e7e5e4] bg-white text-[12px] font-semibold text-[#4e4e4e] hover:border-[#800000] hover:text-[#800000] hover:bg-[#fff5f5] transition-all shadow-sm"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Kembali
+      </router-link>
+    </header>
 
     <div v-if="store.isLoading" class="flex flex-col items-center justify-center min-h-[50vh]">
       <div class="flex flex-row gap-2">
@@ -18,6 +37,7 @@
     </div>
 
     <div v-else>
+
       <!-- 1. Hero Section & Status Pemilihan -->
       <section class="max-w-3xl mx-auto text-center mb-16">
         <h1

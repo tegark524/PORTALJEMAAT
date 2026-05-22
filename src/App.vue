@@ -33,8 +33,8 @@
       </div>
     </transition>
 
-    <!-- Sembunyikan Navbar publik saat berada di halaman login atau admin -->
-    <Navbar v-if="!route.path.startsWith('/admin') && route.name !== 'login'" />
+    <!-- Sembunyikan Navbar publik saat berada di halaman login, admin, atau voting -->
+    <Navbar v-if="!route.path.startsWith('/admin') && !route.path.startsWith('/voting') && route.name !== 'login'" />
 
     <router-view />
   </div>
